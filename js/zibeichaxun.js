@@ -20,7 +20,11 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!res.ok) throw new Error('网络错误 ' + res.status);
       const data = await res.json();
 
-      const hit = data.filter(item => item.字辈.includes(keyword));
+      // 旧（会报错）
+// const hit = data.filter(item => item.字辈.includes(keyword));
+
+// 新（用中间件实时拆字）
+const hit = Chaifengzhibei.query(data, keyword);
 
       if (hit.length === 0) {
         resultDiv.innerHTML = '<p>查不到相关数据</p>';
