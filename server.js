@@ -1,32 +1,32 @@
 // server.js
 
 const express = require("express");
-require("dotenv").config(); // 必须放最顶端，确保最早加载 .env
+require("dotenv").config(); // 必须放在顶部，最早加载 .env
 const { MongoClient } = require("mongodb");
 
 const app = express();
 const port = 3000;
 
-// 通过环境变量读取 URL（你的环境已验证成功）
+// 从 .env 读取 MongoDB URL 和数据库名
 const mongoUrl = process.env.MONGO_URL;
+const dbName = process.env.DB_NAME;
 
-// 延迟创建 client，不在文件顶部立即 new（避免 undefined）
+// 延迟创建客户端，避免 undefined
 let client;
 
 // 初始化数据库并返回集合
 async function getCollection() {
     try {
-        // 若客户端不存在，则创建
         if (!client) {
             client = new MongoClient(mongoUrl);
             await client.connect();
             console.log("MongoDB 连接成功");
         }
 
-        const db = client.db("my_web_db");
+        const db = client.db(dbName);
         const collection = db.collection("user_info");
 
-        // 检查数据是否存在
+        // 如果集合为空，插入初始数据
         const count = await collection.countDocuments();
         if (count === 0) {
             await collection.insertMany([
@@ -48,7 +48,7 @@ async function getCollection() {
 // 静态文件托管
 app.use(express.static("public"));
 
-// API：获取全部用户信息
+// API：获取用户列表
 app.get("/api/users", async (req, res) => {
     try {
         const collection = await getCollection();

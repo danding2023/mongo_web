@@ -1,20 +1,19 @@
-async function loadUsers() {
-  try {
-    const res = await fetch('/api/users');
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const users = await res.json();
-    const ul = document.getElementById('userList');
-    ul.innerHTML = '';
-    users.forEach(u => {
-      const li = document.createElement('li');
-      li.textContent = `${u.name} (${u.age}) - ${u.email}`;
-      ul.appendChild(li);
-    });
-  } catch (err) {
-    console.error(err);
-    document.getElementById('userList').innerHTML = '<li>加载失败 — 请查看控制台</li>';
-  }
-}
+// public/app.js
 
-document.getElementById('reload').addEventListener('click', loadUsers);
-loadUsers();
+// 获取用户列表容器
+const userList = document.getElementById("userList");
+
+// 从后端 API 获取用户数据
+fetch("/api/users")
+  .then(response => response.json())
+  .then(data => {
+    userList.innerHTML = ""; // 先清空
+    data.forEach(item => {
+      // 只显示 name 和 age
+      userList.innerHTML += `<li>${item.name} (${item.age})</li>`;
+    });
+  })
+  .catch(err => {
+    console.error("获取用户列表失败:", err);
+    userList.innerHTML = "<li>加载用户列表失败</li>";
+  });
