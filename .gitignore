@@ -1,17 +1,9 @@
-# Node modules 不追踪
+# Node modules (如果没有 Node.js 可删除)
 node_modules/
+npm-debug.log
 
-# 临时文件
-*.tmp
-*.log
-
-# 忽略所有文件夹下除了 JSON 和 HTML 之外的内容
-# data 下允许 JSON
-!data/*.json
-
-# page 下允许 HTML
-!page/*.html
-
-# 忽略操作系统生成的文件
+# 不忽略 data 文件夹下的 JSON 文件
+# 其他可能敏感或临时文件忽略
+*.env
 .DS_Store
 Thumbs.db
