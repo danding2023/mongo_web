@@ -1,68 +1,46 @@
-// js/zibeichaxun.js
-console.log("【1】zibeichaxun.js 已成功加载");
+console.log("【1】zibeichaxun.js 已加载");
 
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("【2】DOM 已加载完成");
+  console.log("【2】DOM 已加载完成");
 
-    const input = document.getElementById("keyword");
-    const button = document.getElementById("searchBtn");
-    const resultDiv = document.getElementById("result");
+  const input = document.getElementById("queryInput");
+  const button = document.getElementById("queryButton");
+  const resultsDiv = document.getElementById("results");
 
-    if (!input || !button || !resultDiv) {
-        console.error("【错误】页面元素未找到", { input, button, resultDiv });
-        return;
+  button.addEventListener("click", async () => {
+    const query = input.value.trim();
+    console.log("【3】查询关键词：", query);
+
+    if (!query) {
+      resultsDiv.innerHTML = "<p>请输入查询内容</p>";
+      return;
     }
 
-    console.log("【3】页面元素获取成功");
+    try {
+      const response = await fetch("../data/zibei.json");
+      const data = await response.json();
+      console.log("【4】原始数据：", data);
 
-    button.addEventListener("click", () => {
-        const keyword = input.value.trim();
-        console.log("【4】点击查询，关键词 =", keyword);
+      const filtered = data.filter(item =>
+        item["聚集地"] && item["聚集地"].includes(query)
+      );
+      console.log("【5】过滤后结果：", filtered);
 
-        if (!keyword) {
-            resultDiv.innerHTML = "请输入查询关键字";
-            return;
-        }
+      if (filtered.length === 0) {
+        resultsDiv.innerHTML = "<p>未找到匹配结果</p>";
+        return;
+      }
 
-        fetch("../data/zibei.json")
-            .then(response => {
-                console.log("【5】fetch 返回状态：", response.status);
-                if (!response.ok) {
-                    throw new Error("HTTP 状态异常：" + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log("【6】成功读取 JSON 数据：", data);
-
-                if (!Array.isArray(data)) {
-                    console.error("【错误】JSON 不是数组");
-                    resultDiv.innerHTML = "数据格式错误";
-                    return;
-                }
-
-                const matched = data.filter(item =>
-                    item["聚集地"] && item["聚集地"].includes(keyword)
-                );
-
-                console.log("【7】匹配结果：", matched);
-
-                if (matched.length === 0) {
-                    resultDiv.innerHTML = "没有找到匹配记录";
-                    return;
-                }
-
-                let html = "<ul>";
-                matched.forEach(row => {
-                    html += `<li>${row.ID} - ${row["聚集地"]}</li>`;
-                });
-                html += "</ul>";
-
-                resultDiv.innerHTML = html;
-            })
-            .catch(err => {
-                console.error("【8】发生错误：", err);
-                resultDiv.innerHTML = "查询失败，请查看控制台";
-            });
-    });
+      // 渲染结果
+      resultsDiv.innerHTML = "";
+      filtered.forEach(item => {
+        const p = document.createElement("p");
+        p.textContent = `ID: ${item.ID}, 聚集地: ${item.聚集地}`;
+        resultsDiv.appendChild(p);
+      });
+    } catch (err) {
+      console.error("【6】查询失败：", err);
+      resultsDiv.innerHTML = `<p>查询出错：${err.message}</p>`;
+    }
+  });
 });
