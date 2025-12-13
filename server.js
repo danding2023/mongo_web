@@ -5,7 +5,7 @@ require("dotenv").config(); // 必须放在顶部，最早加载 .env
 const { MongoClient } = require("mongodb");
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // 从 .env 读取 MongoDB URL 和数据库名
 const mongoUrl = process.env.MONGO_URL;
