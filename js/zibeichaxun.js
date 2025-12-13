@@ -1,46 +1,42 @@
-console.log("【1】zibeichaxun.js 已加载");
-
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("【2】DOM 已加载完成");
+  const searchBtn = document.getElementById("searchBtn");
+  const keywordInput = document.getElementById("searchKeyword");
+  const resultDiv = document.getElementById("result");
 
-  const input = document.getElementById("queryInput");
-  const button = document.getElementById("queryButton");
-  const resultsDiv = document.getElementById("results");
+  searchBtn.addEventListener("click", async () => {
+    const keyword = keywordInput.value.trim();
+    resultDiv.innerHTML = "查询中...";
 
-  button.addEventListener("click", async () => {
-    const query = input.value.trim();
-    console.log("【3】查询关键词：", query);
-
-    if (!query) {
-      resultsDiv.innerHTML = "<p>请输入查询内容</p>";
+    if (!keyword) {
+      resultDiv.innerHTML = "<p style='color:red;'>请输入关键字</p>";
       return;
     }
 
     try {
       const response = await fetch("../data/zibei.json");
+      if (!response.ok) {
+        throw new Error(`无法加载 JSON: ${response.status}`);
+      }
       const data = await response.json();
-      console.log("【4】原始数据：", data);
 
-      const filtered = data.filter(item =>
-        item["聚集地"] && item["聚集地"].includes(query)
-      );
-      console.log("【5】过滤后结果：", filtered);
+      // 筛选包含关键字的行
+      const filtered = data.filter(item => item.聚集地.includes(keyword));
 
       if (filtered.length === 0) {
-        resultsDiv.innerHTML = "<p>未找到匹配结果</p>";
-        return;
+        resultDiv.innerHTML = "<p>没有找到相关数据。</p>";
+      } else {
+        // 生成 HTML 表格
+        let tableHtml = "<table border='1' cellpadding='5'><tr><th>ID</th><th>聚集地</th></tr>";
+        filtered.forEach(item => {
+          tableHtml += `<tr><td>${item.ID}</td><td>${item.聚集地}</td></tr>`;
+        });
+        tableHtml += "</table>";
+        resultDiv.innerHTML = tableHtml;
       }
 
-      // 渲染结果
-      resultsDiv.innerHTML = "";
-      filtered.forEach(item => {
-        const p = document.createElement("p");
-        p.textContent = `ID: ${item.ID}, 聚集地: ${item.聚集地}`;
-        resultsDiv.appendChild(p);
-      });
     } catch (err) {
-      console.error("【6】查询失败：", err);
-      resultsDiv.innerHTML = `<p>查询出错：${err.message}</p>`;
+      resultDiv.innerHTML = `<p style="color:red;">查询出错：${err.message}</p>`;
+      console.error(err);
     }
   });
 });
