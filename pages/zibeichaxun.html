@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>子辈查询</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; }
+#searchBox { width: 300px; padding: 5px; }
+#searchBtn { padding: 5px 10px; }
+table { border-collapse: collapse; margin-top: 20px; width: 100%; }
+th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+th { background-color: #f4f4f4; }
+</style>
+</head>
+<body>
+<h2>子辈信息查询</h2>
+<input type="text" id="searchBox" placeholder="请输入查询内容">
+<button id="searchBtn">查询</button>
+
+<table id="resultTable" style="display:none;">
+<thead>
+<tr><th>ID</th><th>聚集地</th></tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<script>
+const searchBtn = document.getElementById('searchBtn');
+const searchBox = document.getElementById('searchBox');
+const resultTable = document.getElementById('resultTable');
+const tbody = resultTable.querySelector('tbody');
+
+searchBtn.addEventListener('click', () => {
+  const query = searchBox.value.trim();
+  if(!query){ alert('请输入查询内容'); return; }
+
+  fetch('../data/zibei.json') // 注意路径：相对于 page/ 目录
+    .then(res => res.json())
+    .then(data => {
+      tbody.innerHTML = '';
+      const filtered = data.filter(item => item.聚集地.includes(query) || String(item.ID).includes(query));
+      if(filtered.length === 0){ alert('没有匹配结果'); resultTable.style.display='none'; return; }
+      filtered.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${item.ID}</td><td>${item.聚集地}</td>`;
+        tbody.appendChild(tr);
+      });
+      resultTable.style.display='table';
+    })
+    .catch(err => { console.error(err); alert('加载数据失败'); });
+});
+</script>
+</body>
+</html>
