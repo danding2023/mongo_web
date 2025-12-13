@@ -1,14 +1,21 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
-  <meta charset="utf-8" />
-  <title>简单示例 — 用户列表</title>
+  <meta charset="UTF-8">
+  <title>班级学生信息管理</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <h1>用户列表</h1>
-  <button id="reload">刷新列表</button>
-  <ul id="userList"></ul>
+  <h1>班级学生信息</h1>
 
-  <script src="app.js"></script>
+  <ul id="studentList"></ul>
+
+  <h2>添加学生</h2>
+  <input type="text" id="nameInput" placeholder="姓名">
+  <input type="number" id="ageInput" placeholder="年龄">
+  <input type="text" id="gradeInput" placeholder="年级">
+  <button id="addBtn">添加</button>
+
+  <script src="js/main.js"></script>
 </body>
 </html>
