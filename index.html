@@ -2,20 +2,32 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>班级学生信息管理</title>
+  <title>班级学生管理系统</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <h1>班级学生信息</h1>
+  <!-- 上部 -->
+  <header class="header">
+    <h1>班级学生管理系统</h1>
+  </header>
 
-  <ul id="studentList"></ul>
+  <!-- 中部 -->
+  <div class="main-content">
+    <!-- 左侧目录 -->
+    <nav class="sidebar">
+      <ul>
+        <li><a href="pages/all_students.html" target="contentFrame">所有学生信息</a></li>
+        <li><a href="pages/manage_students.html" target="contentFrame">添加/编辑/删除信息</a></li>
+      </ul>
+    </nav>
 
-  <h2>添加学生</h2>
-  <input type="text" id="nameInput" placeholder="姓名">
-  <input type="number" id="ageInput" placeholder="年龄">
-  <input type="text" id="gradeInput" placeholder="年级">
-  <button id="addBtn">添加</button>
+    <!-- 右侧内容显示区 -->
+    <iframe name="contentFrame" class="content-frame" src="pages/all_students.html"></iframe>
+  </div>
 
-  <script src="js/main.js"></script>
+  <!-- 下部 -->
+  <footer class="footer">
+    <p>© 2025 班级管理系统</p>
+  </footer>
 </body>
 </html>
