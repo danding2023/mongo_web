@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>所有字辈</title>
-    <script src="../js/all_zibeichaxun" defer></script>
+    <style>
+        table { border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 6px 12px; text-align: left; }
+    </style>
 </head>
 <body>
     <h2>所有字辈信息</h2>
@@ -11,8 +14,26 @@
         <thead>
             <tr><th>ID</th><th>字辈</th></tr>
         </thead>
-        <tbody>
-        </tbody>
+        <tbody></tbody>
     </table>
+
+    <script>
+        fetch('../data/zibei.json')
+          .then(r => r.json())
+          .then(list => {
+              const tbody = document.querySelector('#zibeiTable tbody');
+              tbody.innerHTML = '';
+              list.forEach(item => {
+                  const tr = document.createElement('tr');
+                  tr.innerHTML = `<td>${item.ID}</td><td>${item.聚集地}</td>`;
+                  tbody.appendChild(tr);
+              });
+          })
+          .catch(err => {
+              console.error('加载字辈数据失败:', err);
+              document.querySelector('#zibeiTable tbody').innerHTML =
+                '<tr><td colspan="2">数据加载失败，请稍后再试</td></tr>';
+          });
+    </script>
 </body>
 </html>
