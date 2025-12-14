@@ -2,86 +2,79 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>字辈聚集地查询</title>
+  <title>字辈聚集地查询·五关键字版</title>
   <link rel="stylesheet" href="../css/style.css">
   <style>
-    /* 让 3 个输入框排成一行，好看一点 */
-    .search-row{display:flex;gap:8px;align-items:center;margin-bottom:12px}
-    .search-row input[type=text]{width:120px}
+    .search-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+    .search-row input[type=text]{width:110px}
   </style>
 </head>
 <body>
   <h1>字辈聚集地查询</h1>
 
-  <!-- 用户可见的 3 个输入框 -->
+  <!-- 5 个输入框 -->
   <div class="search-row">
-    <input type="text" id="key1" placeholder="输入关键字①">
-    <input type="text" id="key2" placeholder="输入关键字②">
-    <input type="text" id="key3" placeholder="输入关键字③">
+    <input type="text" id="key1" placeholder="关键字①">
+    <input type="text" id="key2" placeholder="关键字②">
+    <input type="text" id="key3" placeholder="关键字③">
+    <input type="text" id="key4" placeholder="关键字④">
+    <input type="text" id="key5" placeholder="关键字⑤">
     <button id="searchBtn">查询</button>
   </div>
 
-  <!-- 原来就有的隐藏框，zibeichaxun.js 依赖它，留着但用户看不到 -->
+  <!-- 隐藏框 + 结果区 -->
   <input type="hidden" id="searchKeyword">
-
-  <!-- 结果区 -->
   <div id="result"></div>
 
-  <!-- 原来的查询逻辑，一行不改 -->
+  <!-- 原查询模块 -->
   <script src="../js/zibeichaxun.js"></script>
 
-  <!-- 新增：把 3 框关键字拼起来，再触发一次查询 -->
- <!-- 把下面整块 script 贴进去，替换掉你刚才那段即可 -->
-<script>
-(()=>{
-  const k1 = document.getElementById('key1');
-  const k2 = document.getElementById('key2');
-  const k3 = document.getElementById('key3');
-  const hidden = document.getElementById('searchKeyword');
-  const btn  = document.getElementById('searchBtn');
-  const result = document.getElementById('result');
+  <!-- 五框前端逻辑 -->
+  <script>
+  (()=>{
+    const keys = Array.from({length:5}, (_,i)=>document.getElementById(`key${i+1}`));
+    const hidden = document.getElementById('searchKeyword');
+    const btn  = document.getElementById('searchBtn');
+    const result = document.getElementById('result');
 
-  /* --- 逐字 AND 拼关键字 --- */
-  const buildKey = () => {
-    const chars = [k1, k2, k3]
-                  .map(i => Array.from(i.value.trim()))
-                  .filter(arr => arr.length);
-    if (!chars.length) return '';
-    return [...new Set(chars.flat())].join(' ');
-  };
+    const buildKey = () => {
+      const chars = keys.map(i => Array.from(i.value.trim())).filter(arr => arr.length);
+      if (!chars.length) return '';
+      return [...new Set(chars.flat())].join(' ');
+    };
 
-  const doQuery = async () => {
-    const kw = hidden.value;
-    if (!kw) return alert('请至少输入一个关键字！');
-    result.textContent = '查询中...';
-    try {
-      const res = await fetch('../data/zibei.json');
-      if (!res.ok) throw new Error('网络错误 ' + res.status);
-      const data = await res.json();
-      const hit = Zibeichaxun.query(data, kw);
-      if (!hit.length) return (result.innerHTML = '<p>查不到相关数据</p>');
-      let html = '<table border="1" cellpadding="6"><tr><th>ID</th><th>地区</th><th>字辈序列</th></tr>';
-      hit.forEach(({ ID, 地区, 字辈 }) => {
-        html += `<tr><td>${ID}</td><td>${地区}</td><td>${字辈.join('，')}</td></tr>`;
-      });
-      result.innerHTML = html + '</table>';
-    } catch (e) {
-      result.innerHTML = `<p style="color:red;">查询出错：${e.message}</p>`;
-    }
-  };
+    const doQuery = async () => {
+      const kw = hidden.value;
+      if (!kw) return alert('请至少输入一个关键字！');
+      result.textContent = '查询中...';
+      try {
+        const res = await fetch('../data/zibei.json');
+        if (!res.ok) throw new Error('网络错误 ' + res.status);
+        const data = await res.json();
+        const hit = Zibeichaxun.query(data, kw);
+        if (!hit.length) return (result.innerHTML = '<p>查不到相关数据</p>');
+        let html = '<table border="1" cellpadding="6"><tr><th>ID</th><th>地区</th><th>字辈序列</th></tr>';
+        hit.forEach(({ ID, 地区, 字辈 }) => {
+          html += `<tr><td>${ID}</td><td>${地区}</td><td>${字辈.join('，')}</td></tr>`;
+        });
+        result.innerHTML = html + '</table>';
+      } catch (e) {
+        result.innerHTML = `<p style="color:red;">查询出错：${e.message}</p>`;
+      }
+    };
 
-  btn.addEventListener('click', function handler(e) {
-    const kw = buildKey();
-    if (!kw) { e.preventDefault(); return alert('请至少输入一个关键字！'); }
-    hidden.value = kw;
-    e.stopImmediatePropagation();
-    doQuery();
-  }, { capture: true });
+    btn.addEventListener('click', function handler(e) {
+      const kw = buildKey();
+      if (!kw) { e.preventDefault(); return alert('请至少输入一个关键字！'); }
+      hidden.value = kw;
+      e.stopImmediatePropagation();
+      doQuery();
+    }, { capture: true });
 
-  [k1, k2, k3].forEach(inp =>
-    inp.addEventListener('keyup', e => { if (e.key === 'Enter') btn.click(); })
-  );
-})();
-</script>
+    keys.forEach(inp =>
+      inp.addEventListener('keyup', e => { if (e.key === 'Enter') btn.click(); })
+    );
+  })();
+  </script>
 </body>
 </html>
