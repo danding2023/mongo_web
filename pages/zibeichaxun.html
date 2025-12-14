@@ -4,16 +4,60 @@
   <meta charset="UTF-8">
   <title>字辈聚集地查询</title>
   <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* 让 3 个输入框排成一行，好看一点 */
+    .search-row{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+    .search-row input[type=text]{width:120px}
+  </style>
 </head>
 <body>
   <h1>字辈聚集地查询</h1>
-  <div>
-    <input type="text" id="searchKeyword" placeholder="输入关键字">
+
+  <!-- 用户可见的 3 个输入框 -->
+  <div class="search-row">
+    <input type="text" id="key1" placeholder="输入关键字①">
+    <input type="text" id="key2" placeholder="输入关键字②">
+    <input type="text" id="key3" placeholder="输入关键字③">
     <button id="searchBtn">查询</button>
   </div>
+
+  <!-- 原来就有的隐藏框，zibeichaxun.js 依赖它，留着但用户看不到 -->
+  <input type="hidden" id="searchKeyword">
+
+  <!-- 结果区 -->
   <div id="result"></div>
 
+  <!-- 原来的查询逻辑，一行不改 -->
   <script src="../js/zibeichaxun.js"></script>
+
+  <!-- 新增：把 3 框关键字拼起来，再触发一次查询 -->
+  <script>
+  (()=>{
+    const k1=document.getElementById('key1');
+    const k2=document.getElementById('key2');
+    const k3=document.getElementById('key3');
+    const hidden=document.getElementById('searchKeyword');
+    const btn =document.getElementById('searchBtn');
+
+    // 拼关键字：非空才要，空格分隔
+    const buildKey=()=>
+      [k1,k2,k3].map(i=>i.value.trim()).filter(Boolean).join(' ');
+
+    // 点击按钮时：把拼好的字写进隐藏框，再主动触发一次原按钮事件
+    btn.addEventListener('click',e=>{
+      const key=buildKey();
+      if(!key)return alert('请至少输入一个关键字！');
+      hidden.value=key;          // 写进隐藏框
+      // 触发原按钮逻辑（zibeichaxun.js 里已有监听）
+      // 用 setTimeout 让它在本事件栈结束后执行，避免事件冲突
+      setTimeout(()=>btn.dispatchEvent(new Event('click')),0);
+    });
+
+    // 回车快捷
+    [k1,k2,k3].forEach(i=>i.addEventListener('keyup',e=>{
+      if(e.key==='Enter')btn.click();
+    }));
+  })();
+  </script>
 </body>
 </html>
-

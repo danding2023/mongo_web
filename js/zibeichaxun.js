@@ -31,7 +31,8 @@ const Zibeichaxun = (() => {
     btn.addEventListener('click', async () => {
       const kw = input.value.trim();
       if (!kw) return (result.innerHTML = '<p style="color:red;">请输入一个汉字</p>');
-      if (kw.length > 1) return (result.innerHTML = '<p style="color:red;">一次只能查一个汉字</p>');
+    /*   if (kw.length > 1) return (result.innerHTML = '<p style="color:red;">一次只能查一个汉字</p>'); */
+
 
       result.textContent = '查询中...';
       try {
