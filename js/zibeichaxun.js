@@ -9,17 +9,24 @@ const Zibeichaxun = (() => {
   const splitChars = s =>
     (typeof s === 'string' ? Array.from(s.replace(/[，；。、（）\s]/g, '')) : []);
 
-  /* ---------- 核心查询 ---------- */
-  const query = (src, kw) => {
-    if (!kw) return [];
-    return src
-      .map(({ ID, 聚集地 }) => {
-        const [地区, 字辈句] = 聚集地.includes('：') ? 聚集地.split('：') : ['未知地区', 聚集地];
-        const 字辈 = splitChars(字辈句);
-        return { ID, 地区, 字辈 };
-      })
-      .filter(({ 字辈 }) => Array.isArray(字辈) && 字辈.includes(kw));
-  };
+/* ---------- 核心查询（替换原 query 函数） ---------- */
+const query = (src, kw) => {
+  if (!kw) return [];
+  // 把用户输入按空格拆成单字数组
+  const need = kw.split(/\s+/);          // ['字A','字B',...]
+  return src
+    .map(({ ID, 聚集地 }) => {
+      const [地区, 字辈句] = 聚集地.includes('：')
+        ? 聚集地.split('：')
+        : ['未知地区', 聚集地];
+      const 字辈 = splitChars(字辈句);
+      return { ID, 地区, 字辈 };
+    })
+    .filter(({ 字辈 }) =>
+      // 每一个关键字都必须出现在 字辈 里
+      need.every(k => 字辈.includes(k))
+    );
+};
 
   /* ---------- 页面交互 ---------- */
   const initUI = () => {
