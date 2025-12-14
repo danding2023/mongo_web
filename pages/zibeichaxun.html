@@ -5,20 +5,48 @@
   <title>字辈聚集地查询·五关键字版</title>
   <link rel="stylesheet" href="../css/style.css">
   <style>
-    .search-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
-    .search-row input[type=text]{width:110px}
+    /* 垂直排列 + 间距 */
+    .search-box {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;   /* 左对齐 */
+      gap: 0;                    /* 框与框之间 0 间距，由 spacer 控制 */
+      margin-bottom: 20px;
+    }
+    .search-box input[type="text"] {
+      width: 240px;
+      padding: 6px;
+    }
+    .search-box button {
+      width: 240px;
+      padding: 8px;
+      margin-top: 8px;           /* 按钮与最后一个空行间距 */
+    }
+    /* 每个输入框下面的空行 */
+    .spacer {
+      height: 1.2em;             /* 想要再高点就改这里 */
+    }
   </style>
 </head>
 <body>
   <h1>字辈聚集地查询</h1>
 
-  <!-- 5 个输入框 -->
-  <div class="search-row">
+  <div class="search-box">
     <input type="text" id="key1" placeholder="关键字①">
+    <div class="spacer"></div>   <!-- 空行 -->
+
     <input type="text" id="key2" placeholder="关键字②">
+    <div class="spacer"></div>
+
     <input type="text" id="key3" placeholder="关键字③">
+    <div class="spacer"></div>
+
     <input type="text" id="key4" placeholder="关键字④">
+    <div class="spacer"></div>
+
     <input type="text" id="key5" placeholder="关键字⑤">
+    <div class="spacer"></div>
+
     <button id="searchBtn">查询</button>
   </div>
 
@@ -29,7 +57,7 @@
   <!-- 原查询模块 -->
   <script src="../js/zibeichaxun.js"></script>
 
-  <!-- 五框前端逻辑 -->
+  <!-- 五框前端逻辑（完全不变） -->
   <script>
   (()=>{
     const keys = Array.from({length:5}, (_,i)=>document.getElementById(`key${i+1}`));
