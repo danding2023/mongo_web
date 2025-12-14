@@ -12,7 +12,6 @@ const Zibeichaxun = (() => {
 /* ---------- 核心查询（替换原 query 函数） ---------- */
 const query = (src, kw) => {
   if (!kw) return [];
-  // 把用户输入按空格拆成单字数组
   const need = kw.split(/\s+/);          // ['字A','字B',...]
   return src
     .map(({ ID, 聚集地 }) => {
@@ -23,8 +22,7 @@ const query = (src, kw) => {
       return { ID, 地区, 字辈 };
     })
     .filter(({ 字辈 }) =>
-      // 每一个关键字都必须出现在 字辈 里
-      need.every(k => 字辈.includes(k))
+      need.every(k => 字辈.includes(k))   // 每个关键字都必须出现
     );
 };
 

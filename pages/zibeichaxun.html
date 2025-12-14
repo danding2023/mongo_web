@@ -41,24 +41,25 @@
   const btn  = document.getElementById('searchBtn');
   const result = document.getElementById('result');
 
-  // 拼关键字
-  const buildKey = () =>
-    [k1, k2, k3].map(i => i.value.trim()).filter(Boolean).join('');
+  /* --- 逐字 AND 拼关键字 --- */
+  const buildKey = () => {
+    const chars = [k1, k2, k3]
+                  .map(i => Array.from(i.value.trim()))
+                  .filter(arr => arr.length);
+    if (!chars.length) return '';
+    return [...new Set(chars.flat())].join(' ');
+  };
 
-  // 真正查数据（只跑一次）
   const doQuery = async () => {
-    const kw = hidden.value;          // 此时已拼好
+    const kw = hidden.value;
     if (!kw) return alert('请至少输入一个关键字！');
-
     result.textContent = '查询中...';
     try {
       const res = await fetch('../data/zibei.json');
       if (!res.ok) throw new Error('网络错误 ' + res.status);
       const data = await res.json();
-
-      const hit = Zibeichaxun.query(data, kw);   // 直接调用它暴露的方法
+      const hit = Zibeichaxun.query(data, kw);
       if (!hit.length) return (result.innerHTML = '<p>查不到相关数据</p>');
-
       let html = '<table border="1" cellpadding="6"><tr><th>ID</th><th>地区</th><th>字辈序列</th></tr>';
       hit.forEach(({ ID, 地区, 字辈 }) => {
         html += `<tr><td>${ID}</td><td>${地区}</td><td>${字辈.join('，')}</td></tr>`;
@@ -69,16 +70,14 @@
     }
   };
 
-  // 拦截第一次点击：拼关键字 → 阻止原监听器 → 自己查
   btn.addEventListener('click', function handler(e) {
     const kw = buildKey();
     if (!kw) { e.preventDefault(); return alert('请至少输入一个关键字！'); }
-    hidden.value = kw;      // 塞进隐藏框（zibeichaxun.js 里会再读，但我们不用它的监听器）
-    e.stopImmediatePropagation(); // 关键：阻止继续冒泡到 zibeichaxun.js 的监听器
-    doQuery();            // 只跑一次
-  }, { capture: true });    // 保证本监听器先执行
+    hidden.value = kw;
+    e.stopImmediatePropagation();
+    doQuery();
+  }, { capture: true });
 
-  // 回车快捷
   [k1, k2, k3].forEach(inp =>
     inp.addEventListener('keyup', e => { if (e.key === 'Enter') btn.click(); })
   );
