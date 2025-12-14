@@ -31,33 +31,58 @@
   <script src="../js/zibeichaxun.js"></script>
 
   <!-- 新增：把 3 框关键字拼起来，再触发一次查询 -->
-  <script>
-  (()=>{
-    const k1=document.getElementById('key1');
-    const k2=document.getElementById('key2');
-    const k3=document.getElementById('key3');
-    const hidden=document.getElementById('searchKeyword');
-    const btn =document.getElementById('searchBtn');
+ <!-- 把下面整块 script 贴进去，替换掉你刚才那段即可 -->
+<script>
+(()=>{
+  const k1 = document.getElementById('key1');
+  const k2 = document.getElementById('key2');
+  const k3 = document.getElementById('key3');
+  const hidden = document.getElementById('searchKeyword');
+  const btn  = document.getElementById('searchBtn');
+  const result = document.getElementById('result');
 
-    // 拼关键字：非空才要，空格分隔
-    const buildKey=()=>
-      [k1,k2,k3].map(i=>i.value.trim()).filter(Boolean).join(' ');
+  // 拼关键字
+  const buildKey = () =>
+    [k1, k2, k3].map(i => i.value.trim()).filter(Boolean).join('');
 
-    // 点击按钮时：把拼好的字写进隐藏框，再主动触发一次原按钮事件
-    btn.addEventListener('click',e=>{
-      const key=buildKey();
-      if(!key)return alert('请至少输入一个关键字！');
-      hidden.value=key;          // 写进隐藏框
-      // 触发原按钮逻辑（zibeichaxun.js 里已有监听）
-      // 用 setTimeout 让它在本事件栈结束后执行，避免事件冲突
-      setTimeout(()=>btn.dispatchEvent(new Event('click')),0);
-    });
+  // 真正查数据（只跑一次）
+  const doQuery = async () => {
+    const kw = hidden.value;          // 此时已拼好
+    if (!kw) return alert('请至少输入一个关键字！');
 
-    // 回车快捷
-    [k1,k2,k3].forEach(i=>i.addEventListener('keyup',e=>{
-      if(e.key==='Enter')btn.click();
-    }));
-  })();
-  </script>
+    result.textContent = '查询中...';
+    try {
+      const res = await fetch('../data/zibei.json');
+      if (!res.ok) throw new Error('网络错误 ' + res.status);
+      const data = await res.json();
+
+      const hit = Zibeichaxun.query(data, kw);   // 直接调用它暴露的方法
+      if (!hit.length) return (result.innerHTML = '<p>查不到相关数据</p>');
+
+      let html = '<table border="1" cellpadding="6"><tr><th>ID</th><th>地区</th><th>字辈序列</th></tr>';
+      hit.forEach(({ ID, 地区, 字辈 }) => {
+        html += `<tr><td>${ID}</td><td>${地区}</td><td>${字辈.join('，')}</td></tr>`;
+      });
+      result.innerHTML = html + '</table>';
+    } catch (e) {
+      result.innerHTML = `<p style="color:red;">查询出错：${e.message}</p>`;
+    }
+  };
+
+  // 拦截第一次点击：拼关键字 → 阻止原监听器 → 自己查
+  btn.addEventListener('click', function handler(e) {
+    const kw = buildKey();
+    if (!kw) { e.preventDefault(); return alert('请至少输入一个关键字！'); }
+    hidden.value = kw;      // 塞进隐藏框（zibeichaxun.js 里会再读，但我们不用它的监听器）
+    e.stopImmediatePropagation(); // 关键：阻止继续冒泡到 zibeichaxun.js 的监听器
+    doQuery();            // 只跑一次
+  }, { capture: true });    // 保证本监听器先执行
+
+  // 回车快捷
+  [k1, k2, k3].forEach(inp =>
+    inp.addEventListener('keyup', e => { if (e.key === 'Enter') btn.click(); })
+  );
+})();
+</script>
 </body>
 </html>
