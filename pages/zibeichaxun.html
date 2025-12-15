@@ -66,25 +66,29 @@
       return [...new Set(chars.flat())].join(' ');
     };
 
-    const doQuery = async () => {
-      const kw = hidden.value;
-      if (!kw) return alert('请至少输入一个关键字！');
-      result.textContent = '查询中...';
-      try {
-        const res = await fetch('../data/zibei.json');
-        if (!res.ok) throw new Error('网络错误 ' + res.status);
-        const data = await res.json();
-        const hit = Zibeichaxun.query(data, kw);
-        if (!hit.length) return (result.innerHTML = '<p>查不到相关数据</p>');
-        let html = '<table border="1" cellpadding="6"><tr><th>ID</th><th>地区</th><th>字辈序列</th></tr>';
-        hit.forEach(({ ID, 地区, 字辈 }) => {
-          html += `<tr><td>${ID}</td><td>${地区}</td><td>${字辈.join('，')}</td></tr>`;
-        });
-        result.innerHTML = html + '</table>';
-      } catch (e) {
-        result.innerHTML = `<p style="color:red;">查询出错：${e.message}</p>`;
-      }
-    };
+const doQuery = async () => {
+  const kw = hidden.value;
+  if (!kw) return alert('请至少输入一个关键字！');
+  result.textContent = '查询中...';
+  try {
+    const res = await fetch('../data/zibei.json');
+    if (!res.ok) throw new Error('网络错误 ' + res.status);
+    const data = await res.json();
+    const hit = Zibeichaxun.query(data, kw);
+    if (!hit.length) return (result.innerHTML = '<p>查不到相关数据</p>');
+
+    /* ===== 新增：数据条数 ===== */
+    const countHtml = `<p style="margin:4px 0;color:#555;">共查到 <strong>${hit.length}</strong> 条记录</p>`;
+
+    let html = countHtml + '<table border="1" cellpadding="6"><tr><th>ID</th><th>地区</th><th>字辈序列</th></tr>';
+    hit.forEach(({ ID, 地区, 字辈 }) => {
+      html += `<tr><td>${ID}</td><td>${地区}</td><td>${字辈.join('，')}</td></tr>`;
+    });
+    result.innerHTML = html + '</table>';
+  } catch (e) {
+    result.innerHTML = `<p style="color:red;">查询出错：${e.message}</p>`;
+  }
+};
 
     btn.addEventListener('click', function handler(e) {
       const kw = buildKey();
