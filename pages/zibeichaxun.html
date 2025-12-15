@@ -78,12 +78,17 @@ const doQuery = async () => {
     const hit = Zibeichaxun.query(data, kw);
     if (!hit.length) return (result.innerHTML = '<p>查不到相关数据</p>');
 
-    /* ===== 新增：数据条数 ===== */
+    /* ===== 新增：数据条数 + 关键字高亮 ===== */
     const countHtml = `<p style="margin:4px 0;color:#555;">共查到 <strong>${hit.length}</strong> 条记录</p>`;
+    const kwArr = kw.split(/\s+/);                 // 拆分关键字
+    const highlight = arr => arr.map(ch =>        // 给命中字加高亮
+      kwArr.includes(ch) ? `<span class="highlight-key">${ch}</span>` : ch
+    );
 
     let html = countHtml + '<table border="1" cellpadding="6"><tr><th>ID</th><th>地区</th><th>字辈序列</th></tr>';
     hit.forEach(({ ID, 地区, 字辈 }) => {
-      html += `<tr><td>${ID}</td><td>${地区}</td><td>${字辈.join('，')}</td></tr>`;
+      const highlighted = highlight(字辈).join('，'); // 高亮后拼串
+      html += `<tr><td>${ID}</td><td>${地区}</td><td>${highlighted}</td></tr>`;
     });
     result.innerHTML = html + '</table>';
   } catch (e) {
