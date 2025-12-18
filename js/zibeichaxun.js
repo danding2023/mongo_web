@@ -17,7 +17,7 @@ const query = (src, kw) => {
     .map(({ ID, 聚集地 }) => {
       const [地区, 字辈句] = 聚集地.includes('：')
         ? 聚集地.split('：')
-        : ['未知地区', 聚集地];
+        : ['未知聚集地', 聚集地];
       const 字辈 = splitChars(字辈句);
       return { ID, 地区, 字辈 };
     })
@@ -48,7 +48,7 @@ const query = (src, kw) => {
         const hit = query(data, kw);
         if (!hit.length) return (result.innerHTML = '<p>查不到相关数据</p>');
 
-        let html = '<table border="1" cellpadding="6"><tr><th>ID</th><th>地区</th><th>字辈序列</th></tr>';
+        let html = '<table border="1" cellpadding="6"><tr><th>ID</th><th>聚集地</th><th>字辈序列</th></tr>';
         hit.forEach(({ ID, 地区, 字辈 }) => {
           html += `<tr><td>${ID}</td><td>${地区}</td><td>${字辈.join('，')}</td></tr>`;
         });
