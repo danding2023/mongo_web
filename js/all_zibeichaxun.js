@@ -7,7 +7,8 @@ fetch('../data/zibei.json')
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${item.ID}</td>
-        <td>${item.聚集地}</td>`;
+        <td>${item.聚集地}</td>
+        <td>${item.字辈与概况}</td>`;
       tbody.appendChild(tr);
     });
   })

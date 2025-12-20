@@ -14,12 +14,9 @@ const query = (src, kw) => {
   if (!kw) return [];
   const need = kw.split(/\s+/);          // ['字A','字B',...]
   return src
-    .map(({ ID, 聚集地 }) => {
-      const [地区, 字辈句] = 聚集地.includes('：')
-        ? 聚集地.split('：')
-        : ['未知聚集地', 聚集地];
-      const 字辈 = splitChars(字辈句);
-      return { ID, 地区, 字辈 };
+    .map(({ ID, 聚集地, 字辈与概况 }) => {
+      const 字辈 = splitChars(字辈与概况);
+      return { ID, 聚集地, 字辈 };
     })
     .filter(({ 字辈 }) =>
       need.every(k => 字辈.includes(k))   // 每个关键字都必须出现
@@ -49,8 +46,8 @@ const query = (src, kw) => {
         if (!hit.length) return (result.innerHTML = '<p>查不到相关数据</p>');
 
         let html = '<table border="1" cellpadding="6"><tr><th>ID</th><th>聚集地</th><th>字辈序列</th></tr>';
-        hit.forEach(({ ID, 地区, 字辈 }) => {
-          html += `<tr><td>${ID}</td><td>${地区}</td><td>${字辈.join('，')}</td></tr>`;
+        hit.forEach(({ ID, 聚集地, 字辈 }) => {
+          html += `<tr><td>${ID}</td><td>${聚集地}</td><td>${字辈.join('，')}</td></tr>`;
         });
         result.innerHTML = html + '</table>';
       } catch (e) {
