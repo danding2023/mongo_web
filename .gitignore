@@ -7,3 +7,5 @@ npm-debug.log
 *.env
 .DS_Store
 Thumbs.db
+data/zibei3333.json
+data/zibei.json
