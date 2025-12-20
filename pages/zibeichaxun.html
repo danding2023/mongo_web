@@ -90,7 +90,7 @@ const doQuery = async () => {
       kwArr.includes(ch) ? `<span class="highlight-key">${ch}</span>` : ch
     );
 
-    let html = countHtml + '<table border="1" cellpadding="6"><tr><th>ID</th><th>地区</th><th>字辈序列</th></tr>';
+    let html = countHtml + '<table border="1" cellpadding="6"><tr><th>ID</th><th>聚集地</th><th>字辈序列</th></tr>';
     hit.forEach(({ ID, 地区, 字辈 }) => {
       const highlighted = highlight(字辈).join('，'); // 高亮后拼串
       html += `<tr><td>${ID}</td><td>${地区}</td><td>${highlighted}</td></tr>`;
