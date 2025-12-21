@@ -18,12 +18,13 @@
     </table>
 
     <script>
+        const limit = 20; // ★ 想展示前几条就改这里
         fetch('../data/zibeiyugaikuang.json')
           .then(r => r.json())
           .then(list => {
               const tbody = document.querySelector('#zibeiTable tbody');
               tbody.innerHTML = '';
-              list.forEach(item => {
+              list.slice(0, limit).forEach(item => {   // ★ 只取前 limit 条
                   const tr = document.createElement('tr');
                   tr.innerHTML = `<td>${item.ID}</td><td>${item.聚集地}</td><td>${item.字辈与概况}</td>`;
                   tbody.appendChild(tr);
