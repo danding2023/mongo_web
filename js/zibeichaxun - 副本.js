@@ -1,38 +1,28 @@
 /**
  * zibeichaxun.js
  * 字辈查询中间件（零依赖，自动挂载）
- * 对外暴露 Zibeichaxun.query / Zibeichaxun.queryStrict
+ * 对外暴露 Zibeichaxun.query(data, kw) 方法
  */
 const Zibeichaxun = (() => {
+  /* ---------- 工具函数 ---------- */
   const splitChars = s =>
-    typeof s === 'string' ? Array.from(s.replace(/[，；。、（）\s]/g, '')) : [];
+    (typeof s === 'string' ? Array.from(s.replace(/[，；。、（）\s]/g, '')) : []);
 
-  /* 模糊查询 */
+  /* ---------- 核心查询 ---------- */
   const query = (src, kw) => {
     if (!kw) return [];
-    const need = kw.split(/\s+/);
+    const need = kw.split(/\s+/);          // ['字A','字B',...]
     return src
       .map(({ ID, 聚集地, 字辈与概况 }) => {
         const 字辈 = splitChars(字辈与概况);
         return { ID, 聚集地, 字辈 };
       })
-      .filter(({ 字辈 }) => need.every(k => 字辈.includes(k)));
+      .filter(({ 字辈 }) =>
+        need.every(k => 字辈.includes(k))   // 每个关键字都必须出现
+      );
   };
 
-  /* 严格连续顺序查询 */
-  const queryStrict = (src, kw) => {
-    if (!kw) return [];
-    const pattern = kw.replace(/\s+/g, '');
-    const reg = new RegExp(pattern, 'g');
-    return src
-      .map(({ ID, 聚集地, 字辈与概况 }) => {
-        const 字辈 = splitChars(字辈与概况).join('');
-        return { ID, 聚集地, 字辈 };
-      })
-      .filter(({ 字辈 }) => reg.test(字辈));
-  };
-
-  /* 自动挂载（默认挂载模糊查询，可手动调用 queryStrict） */
+  /* ---------- 页面交互 ---------- */
   const initUI = () => {
     const btn = document.getElementById('searchBtn');
     const input = document.getElementById('searchKeyword');
@@ -42,13 +32,16 @@ const Zibeichaxun = (() => {
     btn.addEventListener('click', async () => {
       const kw = input.value.trim();
       if (!kw) return (result.innerHTML = '<p style="color:red;">请输入一个汉字</p>');
+
       result.textContent = '查询中...';
       try {
-        const res = await fetch('../data/zibeiyugaikuang.json?v=' + Date.now());
+        const res = await fetch('zibeiyugaikuang.json?v=' + Date.now());   // ← 仅改这一行
         if (!res.ok) throw new Error('网络错误 ' + res.status);
         const data = await res.json();
-        const hit = query(data, kw);   // 默认模糊
+
+        const hit = query(data, kw);
         if (!hit.length) return (result.innerHTML = '<p>查不到相关数据</p>');
+
         let html = '<table border="1" cellpadding="6"><tr><th>ID</th><th>聚集地</th><th>字辈与概况</th></tr>';
         hit.forEach(({ ID, 聚集地, 字辈 }) => {
           html += `<tr><td>${ID}</td><td>${聚集地}</td><td>${字辈.join('，')}</td></tr>`;
@@ -60,11 +53,13 @@ const Zibeichaxun = (() => {
     });
   };
 
+  /* ---------- 自动挂载 ---------- */
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initUI);
   } else {
     initUI();
   }
 
-  return { query, queryStrict };
+  /* ---------- 对外暴露 ---------- */
+  return { query };
 })();

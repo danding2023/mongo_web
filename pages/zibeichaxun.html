@@ -2,86 +2,49 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>字辈聚集地查询·五关键字版</title>
+  <title>字辈聚集地查询</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/custom.css">
   <style>
-    .search-box {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0;
-      margin-bottom: 20px;
-    }
-    .search-box input[type="text"] {
-      width: 240px;
-      padding: 6px;
-    }
-    .search-box button {
-      width: 240px;
-      padding: 8px;
-      margin-top: 8px;
-    }
-    /* 把原来隐藏第2~5框的代码删掉，即可全部显示 */
-    /* 如果只想留一个框，再把下面这段放回去即可
-    #key2, #key3, #key4, #key5 { display: none; }
-    */
-    .spacer { height: 1.2em; }
+    .search-box{display:flex;flex-direction:column;align-items:flex-start;gap:0;margin-bottom:20px}
+    .search-box input[type=text]{width:240px;padding:6px}
+    .search-box button{width:240px;padding:8px;margin-top:8px}
+    .spacer{height:1.2em}
   </style>
 </head>
 <body>
   <h1>字辈聚集地查询</h1>
-  <p class="note">请在下面文本框中输入你想要查询的字辈（派）中的任意字。输入的字越多，显示的结果越少。</p>
+  <p class="note">请输入关键字（可多个汉字连续输入）。</p>
 
- <div class="search-box">
-  <input type="text" id="key1" placeholder="关键字①">
-  <div class="spacer"></div>
-
-  <!-- 以下 4 组隐藏，但 DOM 必须存在 -->
-  <div style="display:none">
-    <input type="text" id="key2" placeholder="关键字②">
+  <div class="search-box">
+    <input type="text" id="key1" placeholder="请输入关键字">
     <div class="spacer"></div>
-    <input type="text" id="key3" placeholder="关键字③">
-    <div class="spacer"></div>
-    <input type="text" id="key4" placeholder="关键字④">
-    <div class="spacer"></div>
-    <input type="text" id="key5" placeholder="关键字⑤">
-    <div class="spacer"></div>
+    <button id="strictBtn">精准查询</button>
+    <button id="fuzzyBtn">模糊查询</button>
   </div>
 
-  <button id="searchBtn">查询</button>
-</div>
-
-  <!-- 隐藏框 + 结果区 -->
-  <input type="hidden" id="searchKeyword">
   <div id="result"></div>
 
-  <!-- 原查询模块 -->
   <script src="../js/zibeichaxun.js"></script>
-
-  <!-- 五框前端逻辑（完全不变） -->
   <script>
   (()=>{
-    const keys = Array.from({length:5}, (_,i)=>document.getElementById(`key${i+1}`));
-    const hidden = document.getElementById('searchKeyword');
-    const btn  = document.getElementById('searchBtn');
-    const result = document.getElementById('result');
+    const strictBtn = document.getElementById('strictBtn');
+    const fuzzyBtn  = document.getElementById('fuzzyBtn');
+    const input     = document.getElementById('key1');
+    const result    = document.getElementById('result');
 
-    const buildKey = () => {
-      const chars = keys.map(i => Array.from(i.value.trim())).filter(arr => arr.length);
-      if (!chars.length) return '';
-      return [...new Set(chars.flat())].join(' ');
-    };
-
-    const doQuery = async () => {
-      const kw = hidden.value;
+    const doQuery = async (strict = false) => {
+      const kw = input.value.trim();
       if (!kw) return alert('请至少输入一个关键字！');
       result.textContent = '查询中...';
       try {
-        const res = await fetch('../data/zibeiyugaikuang.json');
+        const res = await fetch('../data/zibeiyugaikuang.json?v=' + Date.now());
         if (!res.ok) throw new Error('网络错误 ' + res.status);
         const data = await res.json();
-        const hit = Zibeichaxun.query(data, kw);
+
+        const hit = strict ? Zibeichaxun.queryStrict(data, kw)
+                           : Zibeichaxun.query(data, kw);
+
         if (!hit.length) return (result.innerHTML = '<p>查不到相关数据</p>');
 
         const countHtml = `<p style="margin:4px 0;color:#555;">共查到 <strong>${hit.length}</strong> 条记录</p>`;
@@ -101,17 +64,9 @@
       }
     };
 
-    btn.addEventListener('click', function handler(e) {
-      const kw = buildKey();
-      if (!kw) { e.preventDefault(); return alert('请至少输入一个关键字！'); }
-      hidden.value = kw;
-      e.stopImmediatePropagation();
-      doQuery();
-    }, { capture: true });
-
-    keys.forEach(inp =>
-      inp.addEventListener('keyup', e => { if (e.key === 'Enter') btn.click(); })
-    );
+    strictBtn.addEventListener('click', () => doQuery(true));
+    fuzzyBtn.addEventListener('click', () => doQuery(false));
+    input.addEventListener('keyup', e => { if (e.key === 'Enter') fuzzyBtn.click(); });
   })();
   </script>
 </body>
