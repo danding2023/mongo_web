@@ -1,4 +1,4 @@
-fetch('../data/zibei.json')
+fetch('../data/zibeiyugaikuang.json')
   .then(res => res.json())
   .then(data => {
     const tbody = document.querySelector('#zibeiTable tbody');
