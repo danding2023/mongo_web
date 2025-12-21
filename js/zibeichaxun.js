@@ -35,7 +35,7 @@ const Zibeichaxun = (() => {
 
       result.textContent = '查询中...';
       try {
-        const res = await fetch('zibeiyugaikuang.json');   // ← 仅改这一行
+        const res = await fetch('zibeiyugaikuang.json?v=' + Date.now());   // ← 仅改这一行
         if (!res.ok) throw new Error('网络错误 ' + res.status);
         const data = await res.json();
 
