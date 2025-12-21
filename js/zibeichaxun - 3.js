@@ -7,7 +7,7 @@ const Zibeichaxun = (() => {
   const splitChars = s =>
     typeof s === 'string' ? Array.from(s.replace(/[，；。、（）\s]/g, '')) : [];
 
-  /* ---------- 模糊查询 ---------- */
+  /* 模糊查询 */
   const query = (src, kw) => {
     if (!kw) return [];
     const need = kw.split(/\s+/);
@@ -16,25 +16,23 @@ const Zibeichaxun = (() => {
         const 字辈 = splitChars(字辈与概况);
         return { ID, 聚集地, 字辈 };
       })
-      .filter(({ 字辈 }) =>
-        need.every(k => 字辈.includes(k))
-      );
+      .filter(({ 字辈 }) => need.every(k => 字辈.includes(k)));
   };
 
-  /* ---------- 严格连续顺序查询 ---------- */
-  const queryStrict = (src, kw) => {
-    if (!kw) return [];
-    const pattern = kw.replace(/\s+/g, '');        // 去空格
-    const reg = new RegExp(pattern);               // 去掉 g，避免重复计数
-    return src
-      .map(({ ID, 聚集地, 字辈与概况 }) => {
-        const 字辈 = splitChars(字辈与概况);       // 保持数组
-        return { ID, 聚集地, 字辈 };
-      })
-      .filter(({ 字辈 }) => reg.test(字辈.join('')));
-  };
+  /* 严格连续顺序查询 */
+const queryStrict = (src, kw) => {
+  if (!kw) return [];
+  const pattern = kw.replace(/\s+/g, '');
+  const reg = new RegExp(pattern, 'g');
+  return src
+    .map(({ ID, 聚集地, 字辈与概况 }) => {
+      const 字辈 = splitChars(字辈与概况);   // 不要 join，保持数组
+      return { ID, 聚集地, 字辈 };
+    })
+    .filter(({ 字辈 }) => reg.test(字辈.join('')));   // 过滤时用连续串
+};
 
-  /* ---------- 自动挂载（默认用模糊查询） ---------- */
+  /* 自动挂载（默认挂载模糊查询，可手动调用 queryStrict） */
   const initUI = () => {
     const btn = document.getElementById('searchBtn');
     const input = document.getElementById('searchKeyword');
@@ -44,7 +42,6 @@ const Zibeichaxun = (() => {
     btn.addEventListener('click', async () => {
       const kw = input.value.trim();
       if (!kw) return (result.innerHTML = '<p style="color:red;">请输入一个汉字</p>');
-
       result.textContent = '查询中...';
       try {
         const res = await fetch('../data/zibeiyugaikuang.json?v=' + Date.now());
@@ -52,7 +49,6 @@ const Zibeichaxun = (() => {
         const data = await res.json();
         const hit = query(data, kw);   // 默认模糊
         if (!hit.length) return (result.innerHTML = '<p>查不到相关数据</p>');
-
         let html = '<table border="1" cellpadding="6"><tr><th>ID</th><th>聚集地</th><th>字辈与概况</th></tr>';
         hit.forEach(({ ID, 聚集地, 字辈 }) => {
           html += `<tr><td>${ID}</td><td>${聚集地}</td><td>${字辈.join('，')}</td></tr>`;
