@@ -20,17 +20,17 @@ const Zibeichaxun = (() => {
   };
 
   /* 严格连续顺序查询 */
-const queryStrict = (src, kw) => {
-  if (!kw) return [];
-  const pattern = kw.replace(/\s+/g, '');
-  const reg = new RegExp(pattern, 'g');
-  return src
-    .map(({ ID, 聚集地, 字辈与概况 }) => {
-      const 字辈 = splitChars(字辈与概况);   // 不要 join，保持数组
-      return { ID, 聚集地, 字辈 };
-    })
-    .filter(({ 字辈 }) => reg.test(字辈.join('')));   // 过滤时用连续串
-};
+  const queryStrict = (src, kw) => {
+    if (!kw) return [];
+    const pattern = kw.replace(/\s+/g, '');
+    const reg = new RegExp(pattern, 'g');
+    return src
+      .map(({ ID, 聚集地, 字辈与概况 }) => {
+        const 字辈 = splitChars(字辈与概况).join('');
+        return { ID, 聚集地, 字辈 };
+      })
+      .filter(({ 字辈 }) => reg.test(字辈));
+  };
 
   /* 自动挂载（默认挂载模糊查询，可手动调用 queryStrict） */
   const initUI = () => {
