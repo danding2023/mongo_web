@@ -33,10 +33,12 @@
   <h1>字辈聚集地查询</h1>
   <p class="note">请在下面文本框中输入你想要查询的字辈（派）中的任意字。输入的字越多，显示的结果越少。</p>
 
-  <div class="search-box">
-    <input type="text" id="key1" placeholder="关键字①">
-   <div class="spacer"></div>
-   <!--  
+ <div class="search-box">
+  <input type="text" id="key1" placeholder="关键字①">
+  <div class="spacer"></div>
+
+  <!-- 以下 4 组隐藏，但 DOM 必须存在 -->
+  <div style="display:none">
     <input type="text" id="key2" placeholder="关键字②">
     <div class="spacer"></div>
     <input type="text" id="key3" placeholder="关键字③">
@@ -45,9 +47,10 @@
     <div class="spacer"></div>
     <input type="text" id="key5" placeholder="关键字⑤">
     <div class="spacer"></div>
-    -->
-    <button id="searchBtn">查询</button>
   </div>
+
+  <button id="searchBtn">查询</button>
+</div>
 
   <!-- 隐藏框 + 结果区 -->
   <input type="hidden" id="searchKeyword">
