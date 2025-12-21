@@ -30,11 +30,9 @@
                   tbody.appendChild(tr);
               });
           })
-          .catch(err => {
-              console.error('加载字辈数据失败:', err);
-              document.querySelector('#zibeiTable tbody').innerHTML =
-                '<tr><td colspan="3">数据加载失败，请稍后再试</td></tr>';
-          });
+         .catch(err => {
+    alert('失败：' + err.message);   // 立刻知道是网络错还是语法错
+});
     </script>
 </body>
 </html>
