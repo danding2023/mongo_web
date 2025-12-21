@@ -18,7 +18,7 @@
     </table>
 
     <script>
-        fetch('../data/zibei.json')
+        fetch('../data/zibeiyugaikuang.json')
           .then(r => r.json())
           .then(list => {
               const tbody = document.querySelector('#zibeiTable tbody');
@@ -32,7 +32,7 @@
           .catch(err => {
               console.error('加载字辈数据失败:', err);
               document.querySelector('#zibeiTable tbody').innerHTML =
-                '<tr><td colspan="2">数据加载失败，请稍后再试</td></tr>';
+                '<tr><td colspan="3">数据加载失败，请稍后再试</td></tr>';
           });
     </script>
 </body>
