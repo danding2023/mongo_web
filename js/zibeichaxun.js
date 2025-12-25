@@ -12,9 +12,9 @@ const Zibeichaxun = (() => {
     if (!kw) return [];
     const need = Array.isArray(kw) ? kw : kw.split(/\s+/);
     return src
-      .map(({ ID, 聚集地, 字辈与概况 }) => {
-        const 字辈 = splitChars(字辈与概况);
-        return { ID, 聚集地, 字辈 };
+      .map(({ ID号, 聚居地, 字辈用字, 备注 }) => {
+        const 字辈 = splitChars(字辈用字);
+        return { ID号, 聚居地, 字辈用字, 备注, 字辈 };
       })
       .filter(({ 字辈 }) =>
         need.every(k => 字辈.includes(k))
@@ -25,11 +25,11 @@ const Zibeichaxun = (() => {
   const queryStrict = (src, kw) => {
     if (!kw) return [];
     const pattern = kw.replace(/\s+/g, '');
-    const reg = new RegExp(pattern);               // 去掉 g，避免重复计数
+    const reg = new RegExp(pattern);
     return src
-      .map(({ ID, 聚集地, 字辈与概况 }) => {
-        const 字辈 = splitChars(字辈与概况);
-        return { ID, 聚集地, 字辈 };
+      .map(({ ID号, 聚居地, 字辈用字, 备注 }) => {
+        const 字辈 = splitChars(字辈用字);
+        return { ID号, 聚居地, 字辈用字, 备注, 字辈 };
       })
       .filter(({ 字辈 }) => reg.test(字辈.join('')));
   };
@@ -51,7 +51,7 @@ const Zibeichaxun = (() => {
         if (!res.ok) throw new Error('网络错误 ' + res.status);
         const data = await res.json();
 
-        const kwArr = Array.from(kw.replace(/\s+/g, '')); // 只声明一次
+        const kwArr = Array.from(kw.replace(/\s+/g,''));
         const hit   = strict
                     ? Zibeichaxun.queryStrict(data, kw)
                     : Zibeichaxun.query(data, kwArr);
@@ -63,10 +63,17 @@ const Zibeichaxun = (() => {
           kwArr.includes(ch) ? `<span class="highlight-key">${ch}</span>` : ch
         );
 
-        let html = countHtml + '<table border="1" cellpadding="6"><tr><th>ID</th><th>聚集地</th><th>字辈与概况</th></tr>';
-        hit.forEach(({ ID, 聚集地, 字辈 }) => {
-          const highlighted = highlight(字辈).join('，');
-          html += `<tr><td>${ID}</td><td>${聚集地}</td><td>${highlighted}</td></tr>`;
+        let html = countHtml +
+          '<table border="1" cellpadding="6">' +
+          '<tr><th>ID号</th><th>聚居地</th><th>字辈用字</th><th>备注</th></tr>';
+        hit.forEach(({ ID号, 聚居地, 字辈用字, 备注 }) => {
+          const highlighted = highlight(字辈用字).join('，');
+          html += `<tr>
+                     <td>${ID号}</td>
+                     <td>${聚居地}</td>
+                     <td>${highlighted}</td>
+                     <td>${备注||''}</td>
+                   </tr>`;
         });
         result.innerHTML = html + '</table>';
       } catch (e) {
