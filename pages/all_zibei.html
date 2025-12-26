@@ -2,23 +2,23 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>所有字辈</title>
+    <title>字辈信息示例</title>
     <style>
         table { border-collapse: collapse; margin-top: 10px; }
         th, td { padding: 6px 12px; text-align: left; }
     </style>
 </head>
 <body>
-    <h2>所有字辈信息</h2>
+    <h2>字辈信息示例</h2>
     <table border="1" id="zibeiTable">
         <thead>
-            <tr><th>ID</th><th>聚集地</th><th>字辈与概况</th></tr>
+            <tr><th>ID号</th><th>聚居地</th><th>字辈用字</th><th>备注</th></tr>
         </thead>
         <tbody></tbody>
     </table>
 
     <script>
-        const limit = 20; // ★ 想展示前几条就改这里
+        const limit = 10; // ★ 想展示前几条就改这里
         fetch('../data/zibeiyugaikuang.json')
           .then(r => r.json())
           .then(list => {
