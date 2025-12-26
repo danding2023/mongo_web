@@ -6,9 +6,10 @@ fetch('../data/zibeiyugaikuang.json')
     data.forEach(item => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${item.ID}</td>
-        <td>${item.聚集地}</td>
-        <td>${item.字辈与概况}</td>`;
+        <td>${item.ID号}</td>
+        <td>${item.聚居地}</td>
+        <td>${item.字辈用字}</td>
+        <td>${item.备注}</td>`;
       tbody.appendChild(tr);
     });
   })
