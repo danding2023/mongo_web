@@ -26,7 +26,7 @@
               tbody.innerHTML = '';
               list.slice(0, limit).forEach(item => {   // ★ 只取前 limit 条
                   const tr = document.createElement('tr');
-                  tr.innerHTML = `<td>${item.ID}</td><td>${item.聚集地}</td><td>${item.字辈与概况}</td>`;
+                  tr.innerHTML = `<td>${item.ID号}</td><td>${item.聚居地}</td><td>${item.字辈用字}</td><td>${item.备注}</td>`;
                   tbody.appendChild(tr);
               });
           })
