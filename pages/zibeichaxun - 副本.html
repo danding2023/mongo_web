@@ -36,7 +36,7 @@
       if (!kw) return alert('请至少输入一个关键字！');
       result.textContent = '查询中...';
       try {
-        const res = await fetch('https://datagate.271776169.workers.dev/zibeiyugaikuang.json');
+        const res = await fetch('../data/zibeiyugaikuang.json?v=' + Date.now());
         if (!res.ok) throw new Error('网络错误 ' + res.status);
         const data = await res.json();
 
