@@ -14,16 +14,15 @@
 <body>
   <h1>字辈聚集地查询</h1>
   <p class="note">请在下面的文本框中输入辈分用字（先高辈，再晚辈，依次输入，命中率更高）。</p>
-  <p class="note">注意，备注栏中，1表示来自《四川各地李氏简介》，2来自网络。</p>
+
   <div class="search-box">
     <input type="text" id="key1" placeholder="请输入关键字">
     <div class="spacer"></div>
     <button id="strictBtn">精准查询</button>
     <button id="fuzzyBtn">模糊查询</button>
   </div>
-
   <div id="result"></div>
-
+ <h2>注意！备注栏中，1表示信息来自《四川各地李氏简介》，2表示信息来自网络。</h2>
 <script src="/mongo_web/js/zibeichaxun.js"></script>
   <script>
   (()=>{
