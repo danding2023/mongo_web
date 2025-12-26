@@ -54,30 +54,38 @@ body, html {
   color: #333;
 }
 
+.note { 
+margin: 0;
+ min-height: 1.4em; 
+line-height: 1.4em; 
+white-space: pre-wrap; 
+word-break: break-all;
+ }
+
 .sidebar a:hover {
   color: #4CAF50;
 }
 
-.note { 
-  margin: 0;
-  min-height: 1.4em; 
-  line-height: 1.4em; 
-  white-space: pre-wrap; 
-  word-break: break-all;
+/* 右侧内容显示区 */
+.content-frame {
+  width: 80%;
+  border: none;
 }
-
 /* ===== 字辈查询结果 & 控件样式合并版 ===== */
+
+/* 一、可调变量区（只改这里即可） */
 :root {
-  --key-bg-color: #ffeb3b;
-  --key-ft-color: #d32f2f;
-  --table-border: 1px solid #000;
-  --table-padding: 4px 6px;
-  --font-size-up: 18px;
-  --btn-color: #d32f2f;
-  --btn-letter-space: 1px;
-  --stripe-even: #fafafa;
+  --key-bg-color: #ffeb3b;        /* 关键字黄底 */
+  --key-ft-color: #d32f2f;        /* 关键字红字 */
+  --table-border: 1px solid #000; /* 表格边框细黑线 */
+  --table-padding: 4px 6px;       /* 单元格内间距 */
+  --font-size-up: 18px;           /* 输入框&按钮字号 (+2级左右) */
+  --btn-color: #d32f2f;           /* 按钮文字色 */
+  --btn-letter-space: 1px;        /* 按钮字间距 */
+  --stripe-even: #fafafa;         /* 表格偶数行斑马纹底色 */
 }
 
+/* 二、关键字高亮（黄底红字） */
 .highlight-key {
   background-color: var(--key-bg-color);
   color: var(--key-ft-color);
@@ -86,32 +94,21 @@ body, html {
   border-radius: 2px;
 }
 
-/* 表格样式：仅这里 3 行对齐属性被改动 */
-#result table,
-#zibeiTable {
+/* 三、结果表格：细黑单线 + 斑马纹 */
+#result table {
   border-collapse: collapse;
   border: var(--table-border);
 }
 #result table th,
-#zibeiTable th {
+#result table td {
   border: var(--table-border);
   padding: var(--table-padding);
-  text-align: center;      /* 表头左右居中 */
-  vertical-align: middle;  /* 表头上下居中 */
 }
-#result table td,
-#zibeiTable td {
-  border: var(--table-border);
-  padding: var(--table-padding);
-  text-align: left;        /* 表体左右居左 */
-  vertical-align: middle;  /* 表体上下居中 */
-}
-#result table tbody tr:nth-child(even),
-#zibeiTable tbody tr:nth-child(even) {
+#result table tbody tr:nth-child(even) {
   background-color: var(--stripe-even);
 }
 
-/* 输入框 & 按钮 */
+/* 四、输入框 & 按钮：字号 +2 级、按钮红字加粗 */
 #key1, #key2, #key3, #key4, #key5, #searchBtn {
   font-size: var(--font-size-up);
 }
