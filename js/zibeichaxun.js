@@ -47,11 +47,11 @@ const Zibeichaxun = (() => {
       if (!kw) return alert('请至少输入一个关键字！');
       result.textContent = '查询中...';
       try {
-        const res = await fetch('../data/zibeiyugaikuang.json?v=' + Date.now());
+        const res = await fetch('https://datagate.271776169.workers.dev/zibeiyugaikuang.json?v=' + Date.now());
         if (!res.ok) throw new Error('网络错误 ' + res.status);
         const data = await res.json();
 
-        const kwArr = Array.from(kw.replace(/\s+/g,''));
+        const kwArr = Array.from(kw.replace(/\s+/g, ''));
         const hit   = strict
                     ? Zibeichaxun.queryStrict(data, kw)
                     : Zibeichaxun.query(data, kwArr);
@@ -59,7 +59,7 @@ const Zibeichaxun = (() => {
         if (!hit.length) return (result.innerHTML = '<p>查不到相关数据</p>');
 
         const countHtml = `<p style="margin:4px 0;color:#555;">共查到 <strong>${hit.length}</strong> 条记录</p>`;
-        /* 关键修复：highlight 内部先把字符串拆成数组再 map */
+        /* 关键修复：先把字符串拆成数组再 map */
         const highlight = str => 
           Array.from(str).map(ch =>
             kwArr.includes(ch) ? `<span class="highlight-key">${ch}</span>` : ch
