@@ -20,7 +20,7 @@
 
     <script>
         const limit = 10; // ★ 想展示前几条就改这里
-        fetch('../data/zibeiyugaikuang.json')
+        fetch('https://datagate.271776169.workers.dev/zibeiyugaikuang.json')
           .then(r => r.json())
           .then(list => {
               const tbody = document.querySelector('#zibeiTable tbody');
