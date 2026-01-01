@@ -1,7 +1,6 @@
 /**
  * zibeichaxun.js
  * 字辈查询中间件（零依赖，自动挂载）
- * 对外暴露 Zibeichaxun.query / Zibeichaxun.queryStrict
  */
 const Zibeichaxun = (() => {
   const splitChars = s =>
