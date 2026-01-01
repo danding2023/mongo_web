@@ -64,7 +64,7 @@ const Zibeichaxun = (() => {
           '<table border="1" cellpadding="6">' +
           '<tr><th>ID号</th><th>聚居地</th><th>字辈用字</th><th>备注</th></tr>';
         hit.forEach(({ ID号, 聚居地, 字辈用字, 备注 }) => {
-          const highlighted = highlight(字辈用字).join('，');
+          const highlighted = highlight(字辈用字).join('');
           html += `<tr>
                      <td>${ID号}</td>
                      <td>${聚居地}</td>
