@@ -47,7 +47,7 @@
 
         const countHtml = `<p style="margin:4px 0;color:#555;">共查到 <strong>${hit.length}</strong> 条记录</p>`;
         const kwArr = Array.from(kw.replace(/\s+/g,''));
-        const highlight = arr => arr.map(ch =>
+        const highlight = str => Array.from(str).map(ch =>
           kwArr.includes(ch) ? `<span class="highlight-key">${ch}</span>` : ch
         );
 
@@ -70,7 +70,7 @@
     };
 
     strictBtn.addEventListener('click', () => doQuery(true));
-    fuzzyBtn.addEventListener('click', () => doQuery(false));
+    fuzzyBtn.addEventListener('click',  () => doQuery(false));
     input.addEventListener('keyup', e => { if (e.key === 'Enter') fuzzyBtn.click(); });
   })();
   </script>

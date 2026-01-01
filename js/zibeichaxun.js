@@ -6,7 +6,6 @@ const Zibeichaxun = (() => {
   const splitChars = s =>
     typeof s === 'string' ? Array.from(s.replace(/[，；。、（）\s]/g, '')) : [];
 
-  /* ---------- 模糊查询 ---------- */
   const query = (src, kw) => {
     if (!kw) return [];
     const need = Array.isArray(kw) ? kw : kw.split(/\s+/);
@@ -20,7 +19,6 @@ const Zibeichaxun = (() => {
       );
   };
 
-  /* ---------- 严格连续顺序查询 ---------- */
   const queryStrict = (src, kw) => {
     if (!kw) return [];
     const pattern = kw.replace(/\s+/g, '');
@@ -33,7 +31,6 @@ const Zibeichaxun = (() => {
       .filter(({ 字辈 }) => reg.test(字辈.join('')));
   };
 
-  /* ---------- 自动挂载（双按钮版） ---------- */
   const initUI = () => {
     const strictBtn = document.getElementById('strictBtn');
     const fuzzyBtn  = document.getElementById('fuzzyBtn');
@@ -58,7 +55,6 @@ const Zibeichaxun = (() => {
         if (!hit.length) return (result.innerHTML = '<p>查不到相关数据</p>');
 
         const countHtml = `<p style="margin:4px 0;color:#555;">共查到 <strong>${hit.length}</strong> 条记录</p>`;
-        /* 关键修复：先把字符串拆成数组再 map */
         const highlight = str => 
           Array.from(str).map(ch =>
             kwArr.includes(ch) ? `<span class="highlight-key">${ch}</span>` : ch
@@ -68,7 +64,7 @@ const Zibeichaxun = (() => {
           '<table border="1" cellpadding="6">' +
           '<tr><th>ID号</th><th>聚居地</th><th>字辈用字</th><th>备注</th></tr>';
         hit.forEach(({ ID号, 聚居地, 字辈用字, 备注 }) => {
-          const highlighted = highlight(字辈用字).join('');
+          const highlighted = highlight(字辈用字).join('，');
           html += `<tr>
                      <td>${ID号}</td>
                      <td>${聚居地}</td>
