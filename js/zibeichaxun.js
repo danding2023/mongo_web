@@ -64,7 +64,7 @@ const Zibeichaxun = (() => {
           '<table border="1" cellpadding="6">' +
           '<tr><th>IDºÅ</th><th>¾Û¾ÓµØ</th><th>×Ö±²ÓÃ×Ö</th><th>±¸×¢</th></tr>';
         hit.forEach(({ IDºÅ, ¾Û¾ÓµØ, ×Ö±²ÓÃ×Ö, ±¸×¢ }) => {
-          const highlighted = highlight(×Ö±²ÓÃ×Ö).join('£¬');
+          const highlighted = highlight(×Ö±²ÓÃ×Ö).join('');
           html += `<tr>
                      <td>${IDºÅ}</td>
                      <td>${¾Û¾ÓµØ}</td>
