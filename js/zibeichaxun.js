@@ -1,40 +1,36 @@
 /**
  * zibeichaxun.js
- * ×Ö±²²éÑ¯ÖĞ¼ä¼ş£¨ÁãÒÀÀµ£¬×Ô¶¯¹ÒÔØ£©
- * ¶ÔÍâ±©Â¶ Zibeichaxun.query / Zibeichaxun.queryStrict
+ * å­—è¾ˆæŸ¥è¯¢ä¸­é—´ä»¶ï¼ˆé›¶ä¾èµ–ï¼Œè‡ªåŠ¨æŒ‚è½½ï¼‰
  */
 const Zibeichaxun = (() => {
   const splitChars = s =>
-    typeof s === 'string' ? Array.from(s.replace(/[£¬£»¡£¡¢£¨£©\s]/g, '')) : [];
+    typeof s === 'string' ? Array.from(s.replace(/[ï¼Œï¼›ã€‚ã€ï¼ˆï¼‰\s]/g, '')) : [];
 
-  /* ---------- Ä£ºı²éÑ¯ ---------- */
   const query = (src, kw) => {
     if (!kw) return [];
     const need = Array.isArray(kw) ? kw : kw.split(/\s+/);
     return src
-      .map(({ IDºÅ, ¾Û¾ÓµØ, ×Ö±²ÓÃ×Ö, ±¸×¢ }) => {
-        const ×Ö±² = splitChars(×Ö±²ÓÃ×Ö);
-        return { IDºÅ, ¾Û¾ÓµØ, ×Ö±²ÓÃ×Ö, ±¸×¢, ×Ö±² };
+      .map(({ IDå·, èšå±…åœ°, å­—è¾ˆç”¨å­—, å¤‡æ³¨ }) => {
+        const å­—è¾ˆ = splitChars(å­—è¾ˆç”¨å­—);
+        return { IDå·, èšå±…åœ°, å­—è¾ˆç”¨å­—, å¤‡æ³¨, å­—è¾ˆ };
       })
-      .filter(({ ×Ö±² }) =>
-        need.every(k => ×Ö±².includes(k))
+      .filter(({ å­—è¾ˆ }) =>
+        need.every(k => å­—è¾ˆ.includes(k))
       );
   };
 
-  /* ---------- ÑÏ¸ñÁ¬ĞøË³Ğò²éÑ¯ ---------- */
   const queryStrict = (src, kw) => {
     if (!kw) return [];
     const pattern = kw.replace(/\s+/g, '');
     const reg = new RegExp(pattern);
     return src
-      .map(({ IDºÅ, ¾Û¾ÓµØ, ×Ö±²ÓÃ×Ö, ±¸×¢ }) => {
-        const ×Ö±² = splitChars(×Ö±²ÓÃ×Ö);
-        return { IDºÅ, ¾Û¾ÓµØ, ×Ö±²ÓÃ×Ö, ±¸×¢, ×Ö±² };
+      .map(({ IDå·, èšå±…åœ°, å­—è¾ˆç”¨å­—, å¤‡æ³¨ }) => {
+        const å­—è¾ˆ = splitChars(å­—è¾ˆç”¨å­—);
+        return { IDå·, èšå±…åœ°, å­—è¾ˆç”¨å­—, å¤‡æ³¨, å­—è¾ˆ };
       })
-      .filter(({ ×Ö±² }) => reg.test(×Ö±².join('')));
+      .filter(({ å­—è¾ˆ }) => reg.test(å­—è¾ˆ.join('')));
   };
 
-  /* ---------- ×Ô¶¯¹ÒÔØ£¨Ë«°´Å¥°æ£© ---------- */
   const initUI = () => {
     const strictBtn = document.getElementById('strictBtn');
     const fuzzyBtn  = document.getElementById('fuzzyBtn');
@@ -44,11 +40,11 @@ const Zibeichaxun = (() => {
 
     const doQuery = async (strict = false) => {
       const kw = input.value.trim();
-      if (!kw) return alert('ÇëÖÁÉÙÊäÈëÒ»¸ö¹Ø¼ü×Ö£¡');
-      result.textContent = '²éÑ¯ÖĞ...';
+      if (!kw) return alert('è¯·è‡³å°‘è¾“å…¥ä¸€ä¸ªå…³é”®å­—ï¼');
+      result.textContent = 'æŸ¥è¯¢ä¸­...';
       try {
         const res = await fetch('https://datagate.271776169.workers.dev/zibeiyugaikuang.json?v=' + Date.now());
-        if (!res.ok) throw new Error('ÍøÂç´íÎó ' + res.status);
+        if (!res.ok) throw new Error('ç½‘ç»œé”™è¯¯ ' + res.status);
         const data = await res.json();
 
         const kwArr = Array.from(kw.replace(/\s+/g, ''));
@@ -56,10 +52,9 @@ const Zibeichaxun = (() => {
                     ? Zibeichaxun.queryStrict(data, kw)
                     : Zibeichaxun.query(data, kwArr);
 
-        if (!hit.length) return (result.innerHTML = '<p>²é²»µ½Ïà¹ØÊı¾İ</p>');
+        if (!hit.length) return (result.innerHTML = '<p>æŸ¥ä¸åˆ°ç›¸å…³æ•°æ®</p>');
 
-        const countHtml = `<p style="margin:4px 0;color:#555;">¹²²éµ½ <strong>${hit.length}</strong> Ìõ¼ÇÂ¼</p>`;
-        /* ¹Ø¼üĞŞ¸´£ºÏÈ°Ñ×Ö·û´®²ğ³ÉÊı×éÔÙ map */
+        const countHtml = `<p style="margin:4px 0;color:#555;">å…±æŸ¥åˆ° <strong>${hit.length}</strong> æ¡è®°å½•</p>`;
         const highlight = str => 
           Array.from(str).map(ch =>
             kwArr.includes(ch) ? `<span class="highlight-key">${ch}</span>` : ch
@@ -67,19 +62,19 @@ const Zibeichaxun = (() => {
 
         let html = countHtml +
           '<table border="1" cellpadding="6">' +
-          '<tr><th>IDºÅ</th><th>¾Û¾ÓµØ</th><th>×Ö±²ÓÃ×Ö</th><th>±¸×¢</th></tr>';
-        hit.forEach(({ IDºÅ, ¾Û¾ÓµØ, ×Ö±²ÓÃ×Ö, ±¸×¢ }) => {
-          const highlighted = highlight(×Ö±²ÓÃ×Ö).join('');
+          '<tr><th>IDå·</th><th>èšå±…åœ°</th><th>å­—è¾ˆç”¨å­—</th><th>å¤‡æ³¨</th></tr>';
+        hit.forEach(({ IDå·, èšå±…åœ°, å­—è¾ˆç”¨å­—, å¤‡æ³¨ }) => {
+          const highlighted = highlight(å­—è¾ˆç”¨å­—).join('ï¼Œ');
           html += `<tr>
-                     <td>${IDºÅ}</td>
-                     <td>${¾Û¾ÓµØ}</td>
+                     <td>${IDå·}</td>
+                     <td>${èšå±…åœ°}</td>
                      <td>${highlighted}</td>
-                     <td>${±¸×¢||''}</td>
+                     <td>${å¤‡æ³¨||''}</td>
                    </tr>`;
         });
         result.innerHTML = html + '</table>';
       } catch (e) {
-        result.innerHTML = `<p style="color:red;">²éÑ¯³ö´í£º${e.message}</p>`;
+        result.innerHTML = `<p style="color:red;">æŸ¥è¯¢å‡ºé”™ï¼š${e.message}</p>`;
       }
     };
 
