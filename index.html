@@ -11,6 +11,14 @@
         nav { width:20%; background:#e0e0e0; padding:10px; }
         iframe { width:80%; border:none; }
         a { display:block; margin:5px 0; }
+.hit-line{
+  font-size: 16px;          /* 文字稍微大一点        */
+  line-height: 32px;        /* 行高 = 图标高度，保证垂直居中 */
+}
+.v-badge{
+  height: 26px;             /* 图标放大到 26px（可再调 28/30） */
+  vertical-align: middle;   /* 文字图标居中对齐       */
+}
     </style>
 </head>
 <body>
@@ -24,6 +32,10 @@
         </nav>
         <iframe name="contentFrame" src="pages/zibeichaxun.html"></iframe>
     </main>
-    <footer>© 2025 中华李氏字辈查询系统</footer>
+    <footer>© 2025 中华李氏字辈查询系统
+  <span class="hit-line">
+    <img class="v-badge" src="https://visitor-badge.laobi.icu/badge?page_id=danding2023.mongo_web">
+  </span>
+</footer>
 </body>
 </html>

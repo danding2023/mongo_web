@@ -7,6 +7,14 @@
     <style>
         table { border-collapse: collapse; margin-top: 10px; }
         th, td { padding: 6px 12px; text-align: left; }
+.hit-line{
+  font-size: 16px;          /* 文字稍微大一点        */
+  line-height: 32px;        /* 行高 = 图标高度，保证垂直居中 */
+}
+.v-badge{
+  height: 26px;             /* 图标放大到 26px（可再调 28/30） */
+  vertical-align: middle;   /* 文字图标居中对齐       */
+}
     </style>
 </head>
 <body>
@@ -35,5 +43,11 @@
     alert('失败：' + err.message);   // 立刻知道是网络错还是语法错
 });
     </script>
+<footer class="site-footer">
+  <span class="hit-line">
+    <img class="v-badge" src="https://visitor-badge.laobi.icu/badge?page_id=danding2023.mongo_web">
+  </span>
+</footer>
+
 </body>
 </html>
