@@ -9,14 +9,9 @@
     .search-box input[type=text]{width:240px;padding:6px}
     .search-box button{width:240px;padding:8px;margin-top:8px}
     .spacer{height:1.2em}
-.hit-line{
-  font-size: 16px;          /* 文字稍微大一点        */
-  line-height: 32px;        /* 行高 = 图标高度，保证垂直居中 */
-}
-.v-badge{
-  height: 26px;             /* 图标放大到 26px（可再调 28/30） */
-  vertical-align: middle;   /* 文字图标居中对齐       */
-}
+    .hit-line{font-size:16px;line-height:32px}
+    .v-badge{height:26px;vertical-align:middle}
+    .highlight-key{background:#ffeb3b;color:#000;font-weight:bold}
   </style>
 </head>
 <body>
@@ -30,11 +25,13 @@
     <button id="fuzzyBtn">模糊查询</button>
   </div>
   <div id="result"></div>
- <h3>说明：</h3>
- <h5>1、所有字辈信息来自网络、史志、典籍及走访收集，仅为字辈寻根者提供线索参考。</h5>
- <h5>2、备注栏中的数字代表来源，1《四川各地李氏简介》，2网络收集，3延良某《李氏家谱》，4《世界李氏字辈谱10000例》。</h5>
- <h5>3、收集、整理不易，在此向各收集整理人致以诚挚的谢意！。</h5>
-<script src="/mongo_web/js/zibeichaxun.js"></script>
+
+  <h3>说明：</h3>
+  <h5>1、所有字辈信息来自网络、史志、典籍及走访收集，仅为字辈寻根者提供线索参考。</h5>
+  <h5>2、备注栏中的数字代表来源，1《四川各地李氏简介》，2网络收集，3延良某《李氏家谱》，4《世界李氏字辈谱10000例》。</h5>
+  <h5>3、收集、整理不易，在此向各收集整理人致以诚挚的谢意！。</h5>
+
+  <script src="/mongo_web/js/zibeichaxun.js"></script>
   <script>
   (()=>{
     const strictBtn = document.getElementById('strictBtn');
@@ -42,40 +39,78 @@
     const input     = document.getElementById('key1');
     const result    = document.getElementById('result');
 
+    /* ========== 竞速相关 ========== */
+    const TIDB_PING = 'https://datagate.271776169.workers.dev/ping.json'; // Cloudflare 测速接口
+    const JSON_PING = './ping.json';                                     // 原公私库测速接口
+    const STORE_KEY = 'fast_channel';                                    // localStorage key
+    let currentChannel = localStorage.getItem(STORE_KEY);                // 上次优选线路
+
+    /* 测速：并行 fetch，谁先返回且 200 就胜出 */
+    async function race() {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 3000); // 3s 超时
+      const start = performance.now();
+      try {
+        const res = await fetch(TIDB_PING, { method: 'GET', signal: ctrl.signal });
+        clearTimeout(timer);
+        if (res.ok) { localStorage.setItem(STORE_KEY, 'tidb'); return 'tidb'; }
+      } catch (e) {}
+      localStorage.setItem(STORE_KEY, 'json');
+      return 'json';
+    }
+
+    /* 获取本次应走的线路 */
+    async function getChannel() {
+      if (!currentChannel) currentChannel = await race();
+      return currentChannel;
+    }
+
+    /* 统一查询入口 */
     const doQuery = async (strict = false) => {
       const kw = input.value.trim();
       if (!kw) return alert('请至少输入一个关键字！');
       result.textContent = '查询中...';
       try {
-        const res = await fetch('https://datagate.271776169.workers.dev/zibeiyugaikuang.json?v=' + Date.now());
-        if (!res.ok) throw new Error('网络错误 ' + res.status);
-        const data = await res.json();
+        const channel = await getChannel();
+        let data;
+        if (channel === 'tidb') {
+          // TiDB 线路：走 Cloudflare Worker 的完整数据接口
+          const res = await fetch('https://datagate.271776169.workers.dev/zibeiyugaikuang.json?v=' + Date.now());
+          if (!res.ok) throw new Error('TiDB 线路错误 ' + res.status);
+          data = await res.json();
+        } else {
+          // 原公私库线路
+          const res = await fetch('https://datagate.271776169.workers.dev/zibeiyugaikuang.json?v=' + Date.now());
+          if (!res.ok) throw new Error('JSON 线路错误 ' + res.status);
+          data = await res.json();
+        }
 
         const hit = strict ? Zibeichaxun.queryStrict(data, kw)
                            : Zibeichaxun.query(data, kw);
-
         if (!hit.length) return (result.innerHTML = '<p>查不到相关数据</p>');
 
         const countHtml = `<p style="margin:4px 0;color:#555;">共查到 <strong>${hit.length}</strong> 条记录</p>`;
-        const kwArr = Array.from(kw.replace(/\s+/g,''));
+        const kwArr = Array.from(kw.replace(/\s+/g, ''));
         const highlight = str => Array.from(str).map(ch =>
           kwArr.includes(ch) ? `<span class="highlight-key">${ch}</span>` : ch
-        );
+        ).join('，');
 
         let html = countHtml +
           '<table border="1" cellpadding="6">' +
           '<tr><th>ID号</th><th>聚居地</th><th>字辈用字</th><th>备注</th></tr>';
         hit.forEach(({ ID号, 聚居地, 字辈用字, 备注 }) => {
-          const highlighted = highlight(字辈用字).join('，');
           html += `<tr>
                      <td>${ID号}</td>
                      <td>${聚居地}</td>
-                     <td>${highlighted}</td>
+                     <td>${highlight(字辈用字)}</td>
                      <td>${备注||''}</td>
                    </tr>`;
         });
         result.innerHTML = html + '</table>';
       } catch (e) {
+        // 任意线路失败就清除优选标记，下次重新竞速
+        localStorage.removeItem(STORE_KEY);
+        currentChannel = null;
         result.innerHTML = `<p style="color:red;">查询出错：${e.message}</p>`;
       }
     };
@@ -85,11 +120,11 @@
     input.addEventListener('keyup', e => { if (e.key === 'Enter') fuzzyBtn.click(); });
   })();
   </script>
-<footer class="site-footer">
-  <span class="hit-line">
- <img class="v-badge" src="https://visitor-badge.laobi.icu/badge?page_id=danding2023.mongo_web">
-  </span>
-</footer>
 
+  <footer class="site-footer">
+    <span class="hit-line">
+      <img class="v-badge" src="https://visitor-badge.laobi.icu/badge?page_id=danding2023.mongo_web">
+    </span>
+  </footer>
 </body>
 </html>
