@@ -6,8 +6,8 @@
     <link rel="stylesheet" href="css/style.css">
     <style>
         body, html { margin:0; padding:0; height:100%; }
-        header, footer { height:5%; background:#f0f0f0; text-align:center; line-height:2; }
-        main { height:90%; display:flex; }
+        header, footer { height:10%; background:#f0f0f0; text-align:center; line-height:2; }
+        main { height:80%; display:flex; }
         nav { width:20%; background:#e0e0e0; padding:10px; }
         iframe { width:80%; border:none; }
         a { display:block; margin:5px 0; }
@@ -22,15 +22,16 @@
     </style>
 </head>
 <body>
-    <header>中华李氏字辈查询系统 - 首页</header>
+    <header><h2>中华李氏字辈查询系统 - 首页</h2></header>
     <main>
         <nav>
-             <a href="pages/zibeichaxun.html" target="contentFrame">字辈自定义查询</a>
-             <a href="pages/manage_zibei.html" target="contentFrame">字辈添加与删除</a>
-             <a href="pages/all_zibei.html" target="contentFrame">显示所有字辈</a>         
+             <a href="pages/all_zibei.html" target="contentFrame">字辈示例</a>        
+             <a href="pages/zibeichaxun.html" target="contentFrame">字辈查询</a>
+             <a href="pages/manage_zibei.html" target="contentFrame">字辈修改</a>
+ 
            
         </nav>
-        <iframe name="contentFrame" src="pages/zibeichaxun.html"></iframe>
+        <iframe name="contentFrame" src="pages/all_zibei.html"></iframe>
     </main>
     <footer>© 2025 中华李氏字辈查询系统
   <span class="hit-line">
