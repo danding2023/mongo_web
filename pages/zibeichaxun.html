@@ -9,9 +9,13 @@
     .search-box input[type=text]{width:240px;padding:6px}
     .search-box button{width:240px;padding:8px;margin-top:8px}
     .spacer{height:1.2em}
+.hit-line{
+  font-size: 16px;          /* 文字稍微大一点        */
+  line-height: 32px;        /* 行高 = 图标高度，保证垂直居中 */
+}
 .v-badge{
-  height: 26px;      /* 控制大小 */
-  vertical-align: middle;  /* 让文字与图标居中对齐 */
+  height: 26px;             /* 图标放大到 26px（可再调 28/30） */
+  vertical-align: middle;   /* 文字图标居中对齐       */
 }
   </style>
 </head>
@@ -82,7 +86,9 @@
   })();
   </script>
 <footer class="site-footer">
-  <img class="v-badge" src="https://visitor-badge.laobi.icu/badge?page_id=danding2023.mongo_web&count_bg=%2379C83D&title=访问量">
+  <span class="hit-line">
+    <img class="v-badge" src="https://visitor-badge.laobi.icu/badge?page_id=danding2023.mongo_web">
+  </span>
 </footer>
 
 </body>
