@@ -5,12 +5,50 @@
     <title>中华李氏字辈查询系统</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        body, html { margin:0; padding:0; height:100%; }
-        header, footer { height:10%; background:#f0f0f0; text-align:center; line-height:2; }
-        main { height:80%; display:flex; }
-        nav { width:20%; background:#e0e0e0; padding:10px; }
-        iframe { width:80%; border:none; }
-        a { display:block; margin:5px 0; }
+/* ---- 基础复位 ---- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; }
+
+/* ---- 顶部栏 ---- */
+header {
+    height: 60px;                /* 固定高度 */
+    background: #f0f0f0;
+    display: flex;               /* 垂直+水平居中 */
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;             /* 2号字 ≈ 32px */
+    color: red;
+}
+
+/* ---- 底部栏 ---- */
+footer {
+    height: 60px;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ---- 主内容区 ---- */
+main {
+    height: calc(100% - 120px);  /* 占满剩余高度（120=上60+下60） */
+    display: flex;
+}
+
+/* ---- 左侧导航 ---- */
+nav {
+    width: 128px;                /* 8个汉字宽（16px×8） */
+    background: #e0e0e0;
+    padding: 10px;
+    text-align: center;          /* 文字水平居中 */
+}
+
+/* ---- 右侧内容 ---- */
+iframe {
+    flex: 1;                     /* 剩余空间全部给它 */
+    border: none;
+}
 .hit-line{
   font-size: 16px;          /* 文字稍微大一点        */
   line-height: 32px;        /* 行高 = 图标高度，保证垂直居中 */
@@ -27,9 +65,7 @@
         <nav>
              <a href="pages/all_zibei.html" target="contentFrame">字辈示例</a>        
              <a href="pages/zibeichaxun.html" target="contentFrame">字辈查询</a>
-             <a href="pages/manage_zibei.html" target="contentFrame">字辈修改</a>
- 
-           
+             <a href="pages/manage_zibei.html" target="contentFrame">字辈修改</a>           
         </nav>
         <iframe name="contentFrame" src="pages/all_zibei.html"></iframe>
     </main>
