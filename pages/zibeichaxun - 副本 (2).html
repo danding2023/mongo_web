@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TiDB 数据查询</title>
+  <style>
+    body { padding: 20px; font-family: Arial; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f5f5f5; }
+  </style>
+</head>
+<body>
+  <h1>TiDB zibeiyugaikuang 表数据</h1>
+  <div id="loading">正在加载数据...</div>
+  <div id="error" style="color: red; display: none;"></div>
+  <table id="dataTable" style="display: none;"></table>
+
+  <script>
+    // ===== 只改这一行！=====
+    const WORKER_URL = "你的Worker地址"; // 替换成你的Worker访问地址（比如 https://xxx.workers.dev）
+    // =======================
+
+    // 加载数据
+    fetch(WORKER_URL)
+      .then(res => res.json())
+      .then(data => {
+        if (data.code === 200) {
+          document.getElementById("loading").style.display = "none";
+          const table = document.getElementById("dataTable");
+          table.style.display = "table";
+
+          // 生成表头
+          if (data.data.length > 0) {
+            const thead = table.createTHead();
+            const headerRow = thead.insertRow();
+            Object.keys(data.data[0]).forEach(key => {
+              const th = document.createElement("th");
+              th.textContent = key;
+              headerRow.appendChild(th);
+            });
+
+            // 生成数据行
+            data.data.forEach(row => {
+              const tr = table.insertRow();
+              Object.values(row).forEach(value => {
+                const td = tr.insertCell();
+                td.textContent = value || "";
+              });
+            });
+          } else {
+            table.innerHTML = "<tr><td colspan='100'>暂无数据</td></tr>";
+          }
+        } else {
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("error").textContent = "查询失败：" + data.msg;
+          document.getElementById("error").style.display = "block";
+        }
+      })
+      .catch(err => {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("error").textContent = "网络错误：" + err.message;
+        document.getElementById("error").style.display = "block";
+      });
+  </script>
+</body>
+</html>
