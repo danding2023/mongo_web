@@ -42,27 +42,23 @@
     const result      = document.getElementById('result');
     const channelInfo = document.getElementById('channelInfo');
 
-    /* ========== ① 轻量测速接口（仅 ping） ========== */
-    const TIDB_PING = 'https://datagate.271776169.workers.dev/ping.json'; // 轻量
-    const JSON_PING = './ping.json';                                     // 轻量
+    /* ① 轻量测速接口（绝对路径） */
+    const TIDB_PING = 'https://datagate.271776169.workers.dev/ping.json';
+    const JSON_PING = 'https://datagate.271776169.workers.dev/ping.json'; // ← 绝对路径
     const STORE_KEY = 'fast_channel';
     let currentChannel = localStorage.getItem(STORE_KEY);
 
-    /* ========== ② 真正查询接口（大文件） ========== */
+    /* ② 真正查询接口 */
     const TIDB_DATA = 'https://datagate.271776169.workers.dev/zibeiyugaikuang.json';
     const JSON_DATA = 'https://datagate.271776169.workers.dev/zibeiyugaikuang.json';
 
-    /* ---- 页面加载后立即测速 ---- */
     window.addEventListener('DOMContentLoaded',()=>{
-      (async ()=>{
-        currentChannel = await race();
-      })();
+      (async ()=>{ currentChannel = await race(); })();
     });
 
-    /* =================  纯测速  ================= */
     async function race(){
       const ctrl  = new AbortController();
-      const timer = setTimeout(()=>ctrl.abort(),3000); // 3s 超时
+      const timer = setTimeout(()=>ctrl.abort(),3000);
       const start = performance.now();
       let tidbTime=null,jsonTime=null,tidbOK=false,jsonOK=false;
 
@@ -102,7 +98,6 @@
       return currentChannel;
     }
 
-    /* =================  查询入口  ================= */
     const doQuery=async(strict=false)=>{
       const kw=input.value.trim();
       if(!kw)return alert('请至少输入一个关键字！');
