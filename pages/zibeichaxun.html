@@ -12,7 +12,6 @@
     .hit-line{font-size:16px;line-height:32px}
     .v-badge{height:26px;vertical-align:middle}
     .highlight-key{background:#ffeb3b;color:#000;font-weight:bold}
-    /* === 新增：测速信息展示区 === */
     #channelInfo{margin-top:8px;font-size:12px;color:#666;line-height:1.4}
   </style>
 </head>
@@ -25,7 +24,6 @@
     <div class="spacer"></div>
     <button id="strictBtn">精准查询</button>
     <button id="fuzzyBtn">模糊查询</button>
-    <!-- 测速信息会出现在这里 -->
     <div id="channelInfo">正在检测线路…</div>
   </div>
   <div id="result"></div>
@@ -38,130 +36,111 @@
   <script src="/mongo_web/js/zibeichaxun.js"></script>
   <script>
   (()=>{
-    const strictBtn = document.getElementById('strictBtn');
-    const fuzzyBtn  = document.getElementById('fuzzyBtn');
-    const input     = document.getElementById('key1');
-    const result    = document.getElementById('result');
-    const channelInfo= document.getElementById('channelInfo');
+    const strictBtn   = document.getElementById('strictBtn');
+    const fuzzyBtn    = document.getElementById('fuzzyBtn');
+    const input       = document.getElementById('key1');
+    const result      = document.getElementById('result');
+    const channelInfo = document.getElementById('channelInfo');
 
-    /* ========== 竞速相关 ========== */
-    const TIDB_PING = 'https://datagate.271776169.workers.dev/ping.json '; // Cloudflare 测速接口
-    const JSON_PING = './ping.json';                                     // 原公私库测速接口
-    const STORE_KEY = 'fast_channel';                                    // localStorage key
-    let currentChannel = localStorage.getItem(STORE_KEY);                // 上次优选线路
+    const TIDB_PING = 'https://datagate.271776169.workers.dev/ping.json ';
+    const JSON_PING = './ping.json';
+    const STORE_KEY = 'fast_channel';
+    let currentChannel = localStorage.getItem(STORE_KEY);
 
     /* ---- 页面加载后立即测速并展示 ---- */
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded',()=>{
       (async ()=>{
-        const final = await race();          // 测速 + 展示
-        currentChannel = final;              // 保持变量同步
+        const final = await race();
+        currentChannel = final;
       })();
     });
 
-    /* 测速：并行 fetch，谁先返回且 200 就胜出 */
-    async function race() {
-      const ctrl   = new AbortController();
-      const timer  = setTimeout(() => ctrl.abort(), 3000); // 3s 超时
-      const start  = performance.now();
-      let tidbTime = null, jsonTime = null;
-      let tidbOK   = false, jsonOK = false;
+    /* =================  测速+展示  ================= */
+    async function race(){
+      const ctrl  = new AbortController();
+      const timer = setTimeout(()=>ctrl.abort(),3000);
+      const start = performance.now();
+      let tidbTime=null,jsonTime=null,tidbOK=false,jsonOK=false;
 
-      const check = (url, name) =>
-        fetch(url, {method:'GET', signal:ctrl.signal})
-          .then(r => {
-            const t = performance.now() - start;
-            if(r.ok) {                // 只认 200
-              if(name==='tidb'){ tidbTime=t; tidbOK=true; }
-              else            { jsonTime=t; jsonOK=true; }
+      const check=(url,name)=>
+        fetch(url,{method:'GET',signal:ctrl.signal})
+          .then(r=>{
+            const t=performance.now()-start;
+            if(r.ok){
+              if(name==='tidb'){tidbTime=t;tidbOK=true;}
+              else             {jsonTime=t;jsonOK=true;}
               return name;
             }
             return null;
           })
-          .catch(()=> null);
+          .catch(()=>null);
 
-      const winnerPromise = Promise.race([
-        check(TIDB_PING,'tidb'),
-        check(JSON_PING,'json')
-      ]);
-
-      const winner = await winnerPromise;
+      const winner=await Promise.race([check(TIDB_PING,'tidb'),check(JSON_PING,'json')]);
       clearTimeout(timer);
+      await Promise.allSettled([check(TIDB_PING,'tidb'),check(JSON_PING,'json')]);
 
-      // 等待另一个也结束（为了拿到延时）
-      await Promise.allSettled([
-        check(TIDB_PING,'tidb'),
-        check(JSON_PING,'json')
-      ]);
+      const tidbTxt=!tidbOK?'超时/失败':`${tidbTime.toFixed(0)}ms`;
+      const jsonTxt=!jsonOK?'超时/失败':`${jsonTime.toFixed(0)}ms`;
 
-      const final = winner || 'json';               // 默认兜底
-      localStorage.setItem(STORE_KEY, final);
-
-      /* ======== 展示双线结果 ======== */
-      const tidbTxt = !tidbTime ? '超时/失败' : `${tidbTime.toFixed(0)}ms`;
-      const jsonTxt = !jsonTime ? '超时/失败' : `${jsonTime.toFixed(0)}ms`;
+      let final,pickedTxt;
+      if(tidbOK&&jsonOK){
+        final=tidbTime<=jsonTime?'tidb':'json';
+        pickedTxt=final==='tidb'?'TiDB线路（更快）':'JSON线路（更快）';
+      }else if(tidbOK){
+        final='tidb';pickedTxt='TiDB线路（唯一可用）';
+      }else if(jsonOK){
+        final='json';pickedTxt='JSON线路（唯一可用）';
+      }else{
+        final=null;pickedTxt='无可用线路';
+      }
       channelInfo.innerHTML=
         `TiDB线路：${tidbTxt}<br>`+
         `JSON线路：${jsonTxt}<br>`+
-        `最终选用：<strong>${final==='tidb'?'TiDB线路':'JSON线路'}</strong>`;
+        `最终选用：<strong>${pickedTxt}</strong>`;
+      if(final)localStorage.setItem(STORE_KEY,final);
       return final;
     }
 
-    /* 获取本次应走的线路（查询按钮用） */
-    async function getChannel() {
-      if (!currentChannel) currentChannel = await race();
+    async function getChannel(){
+      if(!currentChannel)currentChannel=await race();
       return currentChannel;
     }
 
-    /* ====== 以下与原文件完全一致，未做任何改动 ====== */
-    const doQuery = async (strict = false) => {
-      const kw = input.value.trim();
-      if (!kw) return alert('请至少输入一个关键字！');
-      result.textContent = '查询中...';
-      try {
-        const channel = await getChannel();
+    const doQuery=async(strict=false)=>{
+      const kw=input.value.trim();
+      if(!kw)return alert('请至少输入一个关键字！');
+      result.textContent='查询中...';
+      try{
+        const channel=await getChannel();
         let data;
-        if (channel === 'tidb') {
-          const res = await fetch('https://datagate.271776169.workers.dev/zibeiyugaikuang.json?v=' + Date.now());
-          if (!res.ok) throw new Error('TiDB 线路错误 ' + res.status);
-          data = await res.json();
-        } else {
-          const res = await fetch('https://datagate.271776169.workers.dev/zibeiyugaikuang.json?v=' + Date.now());
-          if (!res.ok) throw new Error('JSON 线路错误 ' + res.status);
-          data = await res.json();
+        if(channel==='tidb'){
+          const res=await fetch('https://datagate.271776169.workers.dev/zibeiyugaikuang.json?v='+Date.now());
+          if(!res.ok)throw new Error('TiDB 线路错误 '+res.status);
+          data=await res.json();
+        }else{
+          const res=await fetch('https://datagate.271776169.workers.dev/zibeiyugaikuang.json?v='+Date.now());
+          if(!res.ok)throw new Error('JSON 线路错误 '+res.status);
+          data=await res.json();
         }
-
-        const hit = strict ? Zibeichaxun.queryStrict(data, kw)
-                           : Zibeichaxun.query(data, kw);
-        if (!hit.length) return (result.innerHTML = '<p>查不到相关数据</p>');
-
-        const countHtml = `<p style="margin:4px 0;color:#555;">共查到 <strong>${hit.length}</strong> 条记录</p>`;
-        const kwArr = Array.from(kw.replace(/\s+/g, ''));
-        const highlight = str => Array.from(str).map(ch =>
-          kwArr.includes(ch) ? `<span class="highlight-key">${ch}</span>` : ch
-        ).join('，');
-
-        let html = countHtml +
-          '<table border="1" cellpadding="6">' +
-          '<tr><th>ID号</th><th>聚居地</th><th>字辈用字</th><th>备注</th></tr>';
-        hit.forEach(({ ID号, 聚居地, 字辈用字, 备注 }) => {
-          html += `<tr>
-                     <td>${ID号}</td>
-                     <td>${聚居地}</td>
-                     <td>${highlight(字辈用字)}</td>
-                     <td>${备注||''}</td>
-                   </tr>`;
+        const hit=strict?Zibeichaxun.queryStrict(data,kw):Zibeichaxun.query(data,kw);
+        if(!hit.length)return(result.innerHTML='<p>查不到相关数据</p>');
+        const countHtml=`<p style="margin:4px 0;color:#555;">共查到 <strong>${hit.length}</strong> 条记录</p>`;
+        const kwArr=Array.from(kw.replace(/\s+/g,''));
+        const highlight=str=>Array.from(str).map(ch=>kwArr.includes(ch)?`<span class="highlight-key">${ch}</span>`:ch).join('，');
+        let html=countHtml+'<table border="1" cellpadding="6"><tr><th>ID号</th><th>聚居地</th><th>字辈用字</th><th>备注</th></tr>';
+        hit.forEach(({ID号,聚居地,字辈用字,备注})=>{
+          html+=`<tr><td>${ID号}</td><td>${聚居地}</td><td>${highlight(字辈用字)}</td><td>${备注||''}</td></tr>`;
         });
-        result.innerHTML = html + '</table>';
-      } catch (e) {
-        localStorage.removeItem(STORE_KEY);
-        currentChannel = null;
-        result.innerHTML = `<p style="color:red;">查询出错：${e.message}</p>`;
+        result.innerHTML=html+'</table>';
+      }catch(e){
+        localStorage.removeItem(STORE_KEY);currentChannel=null;
+        result.innerHTML=`<p style="color:red;">查询出错：${e.message}</p>`;
       }
     };
 
-    strictBtn.addEventListener('click', () => doQuery(true));
-    fuzzyBtn.addEventListener('click',  () => doQuery(false));
-    input.addEventListener('keyup', e => { if (e.key === 'Enter') fuzzyBtn.click(); });
+    strictBtn.addEventListener('click',()=>doQuery(true));
+    fuzzyBtn.addEventListener('click',()=>doQuery(false));
+    input.addEventListener('keyup',e=>{if(e.key==='Enter')fuzzyBtn.click();});
   })();
   </script>
 
