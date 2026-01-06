@@ -42,23 +42,27 @@
     const result      = document.getElementById('result');
     const channelInfo = document.getElementById('channelInfo');
 
-    const TIDB_PING = 'https://datagate.271776169.workers.dev/ping.json ';
-    const JSON_PING = './ping.json';
+    /* ========== ① 轻量测速接口（仅 ping） ========== */
+    const TIDB_PING = 'https://datagate.271776169.workers.dev/ping.json'; // 轻量
+    const JSON_PING = './ping.json';                                     // 轻量
     const STORE_KEY = 'fast_channel';
     let currentChannel = localStorage.getItem(STORE_KEY);
 
-    /* ---- 页面加载后立即测速并展示 ---- */
+    /* ========== ② 真正查询接口（大文件） ========== */
+    const TIDB_DATA = 'https://datagate.271776169.workers.dev/zibeiyugaikuang.json';
+    const JSON_DATA = 'https://datagate.271776169.workers.dev/zibeiyugaikuang.json';
+
+    /* ---- 页面加载后立即测速 ---- */
     window.addEventListener('DOMContentLoaded',()=>{
       (async ()=>{
-        const final = await race();
-        currentChannel = final;
+        currentChannel = await race();
       })();
     });
 
-    /* =================  测速+展示  ================= */
+    /* =================  纯测速  ================= */
     async function race(){
       const ctrl  = new AbortController();
-      const timer = setTimeout(()=>ctrl.abort(),3000);
+      const timer = setTimeout(()=>ctrl.abort(),3000); // 3s 超时
       const start = performance.now();
       let tidbTime=null,jsonTime=null,tidbOK=false,jsonOK=false;
 
@@ -66,11 +70,7 @@
         fetch(url,{method:'GET',signal:ctrl.signal})
           .then(r=>{
             const t=performance.now()-start;
-            if(r.ok){
-              if(name==='tidb'){tidbTime=t;tidbOK=true;}
-              else             {jsonTime=t;jsonOK=true;}
-              return name;
-            }
+            if(r.ok){if(name==='tidb'){tidbTime=t;tidbOK=true;}else{jsonTime=t;jsonOK=true;}return name;}
             return null;
           })
           .catch(()=>null);
@@ -86,13 +86,9 @@
       if(tidbOK&&jsonOK){
         final=tidbTime<=jsonTime?'tidb':'json';
         pickedTxt=final==='tidb'?'TiDB线路（更快）':'JSON线路（更快）';
-      }else if(tidbOK){
-        final='tidb';pickedTxt='TiDB线路（唯一可用）';
-      }else if(jsonOK){
-        final='json';pickedTxt='JSON线路（唯一可用）';
-      }else{
-        final=null;pickedTxt='无可用线路';
-      }
+      }else if(tidbOK){final='tidb';pickedTxt='TiDB线路（唯一可用）';}
+      else if(jsonOK){final='json';pickedTxt='JSON线路（唯一可用）';}
+      else{final=null;pickedTxt='无可用线路';}
       channelInfo.innerHTML=
         `TiDB线路：${tidbTxt}<br>`+
         `JSON线路：${jsonTxt}<br>`+
@@ -106,24 +102,21 @@
       return currentChannel;
     }
 
+    /* =================  查询入口  ================= */
     const doQuery=async(strict=false)=>{
       const kw=input.value.trim();
       if(!kw)return alert('请至少输入一个关键字！');
       result.textContent='查询中...';
       try{
         const channel=await getChannel();
-        let data;
-        if(channel==='tidb'){
-          const res=await fetch('https://datagate.271776169.workers.dev/zibeiyugaikuang.json?v='+Date.now());
-          if(!res.ok)throw new Error('TiDB 线路错误 '+res.status);
-          data=await res.json();
-        }else{
-          const res=await fetch('https://datagate.271776169.workers.dev/zibeiyugaikuang.json?v='+Date.now());
-          if(!res.ok)throw new Error('JSON 线路错误 '+res.status);
-          data=await res.json();
-        }
+        if(!channel)throw new Error('没有可用线路，无法查询');
+        const url=channel==='tidb'?TIDB_DATA:JSON_DATA;
+        const res=await fetch(url+'?v='+Date.now());
+        if(!res.ok)throw new Error(channel+' 线路错误 '+res.status);
+        const data=await res.json();
         const hit=strict?Zibeichaxun.queryStrict(data,kw):Zibeichaxun.query(data,kw);
         if(!hit.length)return(result.innerHTML='<p>查不到相关数据</p>');
+
         const countHtml=`<p style="margin:4px 0;color:#555;">共查到 <strong>${hit.length}</strong> 条记录</p>`;
         const kwArr=Array.from(kw.replace(/\s+/g,''));
         const highlight=str=>Array.from(str).map(ch=>kwArr.includes(ch)?`<span class="highlight-key">${ch}</span>`:ch).join('，');
