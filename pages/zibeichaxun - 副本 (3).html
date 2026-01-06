@@ -12,8 +12,6 @@
     .hit-line{font-size:16px;line-height:32px}
     .v-badge{height:26px;vertical-align:middle}
     .highlight-key{background:#ffeb3b;color:#000;font-weight:bold}
-    /* 新增：线路信息展示区域 */
-    #channelInfo{margin-top:8px;font-size:12px;color:#666;line-height:1.4}
   </style>
 </head>
 <body>
@@ -25,8 +23,6 @@
     <div class="spacer"></div>
     <button id="strictBtn">精准查询</button>
     <button id="fuzzyBtn">模糊查询</button>
-    <!-- 新增：线路信息展示 -->
-    <div id="channelInfo"></div>
   </div>
   <div id="result"></div>
 
@@ -42,10 +38,9 @@
     const fuzzyBtn  = document.getElementById('fuzzyBtn');
     const input     = document.getElementById('key1');
     const result    = document.getElementById('result');
-    const channelInfo = document.getElementById('channelInfo'); // 新增：信息展示容器
 
     /* ========== 竞速相关 ========== */
-    const TIDB_PING = 'https://datagate.271776169.workers.dev/ping.json '; // Cloudflare 测速接口
+    const TIDB_PING = 'https://datagate.271776169.workers.dev/ping.json'; // Cloudflare 测速接口
     const JSON_PING = './ping.json';                                     // 原公私库测速接口
     const STORE_KEY = 'fast_channel';                                    // localStorage key
     let currentChannel = localStorage.getItem(STORE_KEY);                // 上次优选线路
@@ -55,36 +50,13 @@
       const ctrl = new AbortController();
       const timer = setTimeout(() => ctrl.abort(), 3000); // 3s 超时
       const start = performance.now();
-      let tidbTime = null, jsonTime = null, tidbTimeout = false, jsonTimeout = false;
-
-      // 并行测速
-      const tidbPromise = fetch(TIDB_PING, { method: 'GET', signal: ctrl.signal })
-        .then(res => { tidbTime = performance.now() - start; return res.ok ? 'tidb' : null; })
-        .catch(() => { tidbTimeout = true; return null; });
-
-      const jsonPromise = fetch(JSON_PING, { method: 'GET', signal: ctrl.signal })
-        .then(res => { jsonTime = performance.now() - start; return res.ok ? 'json' : null; })
-        .catch(() => { jsonTimeout = true; return null; });
-
-      // 竞速：谁先到且有效
-      const winner = await Promise.race([tidbPromise, jsonPromise]);
-      clearTimeout(timer);
-
-      // 等待另一个也完成（为了展示延时）
-      await Promise.allSettled([tidbPromise, jsonPromise]);
-
-      // 展示双线信息
-      const tidbStatus = tidbTimeout ? '超时' : (tidbTime ? `${tidbTime.toFixed(0)}ms` : '失败');
-      const jsonStatus = jsonTimeout ? '超时' : (jsonTime ? `${jsonTime.toFixed(0)}ms` : '失败');
-      const final = winner || 'json'; // 默认兜底
-      channelInfo.innerHTML = `
-        TiDB线路延时：${tidbStatus}<br>
-        JSON线路延时：${jsonStatus}<br>
-        最终选用：<strong>${final === 'tidb' ? 'TiDB线路' : 'JSON线路'}</strong>
-      `;
-
-      localStorage.setItem(STORE_KEY, final);
-      return final;
+      try {
+        const res = await fetch(TIDB_PING, { method: 'GET', signal: ctrl.signal });
+        clearTimeout(timer);
+        if (res.ok) { localStorage.setItem(STORE_KEY, 'tidb'); return 'tidb'; }
+      } catch (e) {}
+      localStorage.setItem(STORE_KEY, 'json');
+      return 'json';
     }
 
     /* 获取本次应走的线路 */
@@ -103,12 +75,12 @@
         let data;
         if (channel === 'tidb') {
           // TiDB 线路：走 Cloudflare Worker 的完整数据接口
-          const res = await fetch('https://datagate.271776169.workers.dev/zibeiyugaikuang.json?v= ' + Date.now());
+          const res = await fetch('https://datagate.271776169.workers.dev/zibeiyugaikuang.json?v=' + Date.now());
           if (!res.ok) throw new Error('TiDB 线路错误 ' + res.status);
           data = await res.json();
         } else {
           // 原公私库线路
-          const res = await fetch('https://datagate.271776169.workers.dev/zibeiyugaikuang.json?v= ' + Date.now());
+          const res = await fetch('https://datagate.271776169.workers.dev/zibeiyugaikuang.json?v=' + Date.now());
           if (!res.ok) throw new Error('JSON 线路错误 ' + res.status);
           data = await res.json();
         }
@@ -151,7 +123,7 @@
 
   <footer class="site-footer">
     <span class="hit-line">
-      <img class="v-badge" src="https://visitor-badge.laobi.icu/badge?page_id=danding2023.mongo_web ">
+      <img class="v-badge" src="https://visitor-badge.laobi.icu/badge?page_id=danding2023.mongo_web">
     </span>
   </footer>
 </body>
