@@ -42,38 +42,41 @@
     const result      = document.getElementById('result');
     const channelInfo = document.getElementById('channelInfo');
 
-    /* ① 轻量测速接口（绝对路径） */
-    const TIDB_PING = 'https://datagate.271776169.workers.dev/ping.json';
-    const JSON_PING = 'https://datagate.271776169.workers.dev/ping.json'; // ← 绝对路径
+    /* ========== ① 真正的数据接口当测速 + 缓存 ========== */
+    const TIDB_URL = 'https://datagate.271776169.workers.dev/zibeiyugaikuang.json';
+    const JSON_URL = 'https://datagate.271776169.workers.dev/zibeiyugaikuang.json';
     const STORE_KEY = 'fast_channel';
     let currentChannel = localStorage.getItem(STORE_KEY);
+    let cache = null; // 全局缓存，拉一次后永久复用
 
-    /* ② 真正查询接口 */
-    const TIDB_DATA = 'https://datagate.271776169.workers.dev/zibeiyugaikuang.json';
-    const JSON_DATA = 'https://datagate.271776169.workers.dev/zibeiyugaikuang.json';
-
+    /* ---- 页面加载就竞速 + 缓存数据 ---- */
     window.addEventListener('DOMContentLoaded',()=>{
-      (async ()=>{ currentChannel = await race(); })();
+      (async ()=>{
+        currentChannel = await raceAndCache();
+      })();
     });
 
-    async function race(){
+    async function raceAndCache(){
       const ctrl  = new AbortController();
-      const timer = setTimeout(()=>ctrl.abort(),3000);
+      const timer = setTimeout(()=>ctrl.abort(),5000); // 放宽到 5s
       const start = performance.now();
-      let tidbTime=null,jsonTime=null,tidbOK=false,jsonOK=false;
+      let tidbTime=null,jsonTime=null,tidbOK=false,jsonOK=false,tidbData=null,jsonData=null;
 
-      const check=(url,name)=>
-        fetch(url,{method:'GET',signal:ctrl.signal})
-          .then(r=>{
-            const t=performance.now()-start;
-            if(r.ok){if(name==='tidb'){tidbTime=t;tidbOK=true;}else{jsonTime=t;jsonOK=true;}return name;}
-            return null;
-          })
-          .catch(()=>null);
+      const check=async (url,name)=>{
+        try{
+          const res=await fetch(url+'?v='+Date.now(),{signal:ctrl.signal});
+          if(!res.ok)return null;
+          const t=performance.now()-start;
+          const data=await res.json();
+          if(name==='tidb'){tidbTime=t;tidbOK=true;tidbData=data;}
+          else{jsonTime=t;jsonOK=true;jsonData=data;}
+          return name;
+        }catch{ return null; }
+      };
 
-      const winner=await Promise.race([check(TIDB_PING,'tidb'),check(JSON_PING,'json')]);
+      const winner=await Promise.race([check(TIDB_URL,'tidb'),check(JSON_URL,'json')]);
       clearTimeout(timer);
-      await Promise.allSettled([check(TIDB_PING,'tidb'),check(JSON_PING,'json')]);
+      await Promise.allSettled([check(TIDB_URL,'tidb'),check(JSON_URL,'json')]);
 
       const tidbTxt=!tidbOK?'超时/失败':`${tidbTime.toFixed(0)}ms`;
       const jsonTxt=!jsonOK?'超时/失败':`${jsonTime.toFixed(0)}ms`;
@@ -89,26 +92,32 @@
         `TiDB线路：${tidbTxt}<br>`+
         `JSON线路：${jsonTxt}<br>`+
         `最终选用：<strong>${pickedTxt}</strong>`;
+
+      /* 把数据缓存起来，后续查询直接复用 */
+      if(final==='tidb')cache=tidbData;
+      if(final==='json')cache=jsonData;
       if(final)localStorage.setItem(STORE_KEY,final);
       return final;
     }
 
-    async function getChannel(){
-      if(!currentChannel)currentChannel=await race();
-      return currentChannel;
+    async function getData(){
+      if(cache)return cache; // 已有缓存直接返回
+      const channel=localStorage.getItem(STORE_KEY)||await raceAndCache();
+      if(!channel)throw new Error('没有可用线路');
+      const url=channel==='tidb'?TIDB_URL:JSON_URL;
+      const res=await fetch(url+'?v='+Date.now());
+      if(!res.ok)throw new Error(channel+' 线路错误 '+res.status);
+      cache=await res.json();
+      return cache;
     }
 
+    /* =================  查询  ================= */
     const doQuery=async(strict=false)=>{
       const kw=input.value.trim();
       if(!kw)return alert('请至少输入一个关键字！');
       result.textContent='查询中...';
       try{
-        const channel=await getChannel();
-        if(!channel)throw new Error('没有可用线路，无法查询');
-        const url=channel==='tidb'?TIDB_DATA:JSON_DATA;
-        const res=await fetch(url+'?v='+Date.now());
-        if(!res.ok)throw new Error(channel+' 线路错误 '+res.status);
-        const data=await res.json();
+        const data=await getData();
         const hit=strict?Zibeichaxun.queryStrict(data,kw):Zibeichaxun.query(data,kw);
         if(!hit.length)return(result.innerHTML='<p>查不到相关数据</p>');
 
@@ -121,7 +130,7 @@
         });
         result.innerHTML=html+'</table>';
       }catch(e){
-        localStorage.removeItem(STORE_KEY);currentChannel=null;
+        localStorage.removeItem(STORE_KEY);
         result.innerHTML=`<p style="color:red;">查询出错：${e.message}</p>`;
       }
     };
