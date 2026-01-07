@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>字辈聚集地查询</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .search-box{display:flex;flex-direction:column;align-items:flex-start;gap:0;margin-bottom:20px}
+    .search-box input[type=text]{width:240px;padding:6px}
+    .search-box button{width:240px;padding:8px;margin-top:8px}
+    .spacer{height:1.2em}
+    .hit-line{font-size:16px;line-height:32px}
+    .v-badge{height:26px;vertical-align:middle}
+    .highlight-key{background:#ffeb3b;color:#000;font-weight:bold}
+    #channelInfo{margin-top:8px;font-size:12px;color:#666;line-height:1.4}
+  </style>
+</head>
+<body>
+  <h2>字辈聚集地查询</h2>
+  <p class="note">请在下面的文本框中输入辈分用字（先高辈，再晚辈，依次输入，命中率更高）。</p>
+
+  <div class="search-box">
+    <input type="text" id="key1" placeholder="请输入关键字">
+    <div class="spacer"></div>
+    <button id="strictBtn">精准查询</button>
+    <button id="fuzzyBtn">模糊查询</button>
+    <div id="channelInfo">正在检测线路…</div>
+  </div>
+  <div id="result"></div>
+
+  <h3>说明：</h3>
+  <h5>1、所有字辈信息来自网络、史志、典籍及走访收集，仅为字辈寻根者提供线索参考。</h5>
+  <h5>2、备注栏中的数字代表来源，1《四川各地李氏简介》，2网络收集，3延良某《李氏家谱》，4《世界李氏字辈谱10000例》。</h5>
+  <h5>3、收集、整理不易，在此向各收集整理人致以诚挚的谢意！</h5>
+
+  <script src="/mongo_web/js/zibeichaxun.js"></script>
+  <script>
+  (()=>{
+    const strictBtn   = document.getElementById('strictBtn');
+    const fuzzyBtn    = document.getElementById('fuzzyBtn');
+    const input       = document.getElementById('key1');
+    const result      = document.getElementById('result');
+    const channelInfo = document.getElementById('channelInfo');
+
+    /* ========== ① 真正的数据接口当测速 + 缓存 ========== */
+    const TIDB_URL = 'https://datagate.271776169.workers.dev/zibeiyugaikuang.json';
+    const JSON_URL = 'https://datagate.271776169.workers.dev/zibeiyugaikuang.json';
+    const STORE_KEY = 'fast_channel';
+    let currentChannel = localStorage.getItem(STORE_KEY);
+    let cache = null; // 全局缓存，拉一次后永久复用
+
+    /* ---- 页面加载就竞速 + 缓存数据 ---- */
+    window.addEventListener('DOMContentLoaded',()=>{
+      (async ()=>{
+        currentChannel = await raceAndCache();
+      })();
+    });
+
+    async function raceAndCache(){
+      const ctrl  = new AbortController();
+      const timer = setTimeout(()=>ctrl.abort(),5000); // 放宽到 5s
+      const start = performance.now();
+      let tidbTime=null,jsonTime=null,tidbOK=false,jsonOK=false,tidbData=null,jsonData=null;
+
+      const check=async (url,name)=>{
+        try{
+          const res=await fetch(url+'?v='+Date.now(),{signal:ctrl.signal});
+          if(!res.ok)return null;
+          const t=performance.now()-start;
+          const data=await res.json();
+          if(name==='tidb'){tidbTime=t;tidbOK=true;tidbData=data;}
+          else{jsonTime=t;jsonOK=true;jsonData=data;}
+          return name;
+        }catch{ return null; }
+      };
+
+      const winner=await Promise.race([check(TIDB_URL,'tidb'),check(JSON_URL,'json')]);
+      clearTimeout(timer);
+      await Promise.allSettled([check(TIDB_URL,'tidb'),check(JSON_URL,'json')]);
+
+      const tidbTxt=!tidbOK?'超时/失败':`${tidbTime.toFixed(0)}ms`;
+      const jsonTxt=!jsonOK?'超时/失败':`${jsonTime.toFixed(0)}ms`;
+
+      let final,pickedTxt;
+      if(tidbOK&&jsonOK){
+        final=tidbTime<=jsonTime?'tidb':'json';
+        pickedTxt=final==='tidb'?'TiDB线路（更快）':'JSON线路（更快）';
+      }else if(tidbOK){final='tidb';pickedTxt='TiDB线路（唯一可用）';}
+      else if(jsonOK){final='json';pickedTxt='JSON线路（唯一可用）';}
+      else{final=null;pickedTxt='无可用线路';}
+      channelInfo.innerHTML=
+        `TiDB线路：${tidbTxt}<br>`+
+        `JSON线路：${jsonTxt}<br>`+
+        `最终选用：<strong>${pickedTxt}</strong>`;
+
+      /* 把数据缓存起来，后续查询直接复用 */
+      if(final==='tidb')cache=tidbData;
+      if(final==='json')cache=jsonData;
+      if(final)localStorage.setItem(STORE_KEY,final);
+      return final;
+    }
+
+    async function getData(){
+      if(cache)return cache; // 已有缓存直接返回
+      const channel=localStorage.getItem(STORE_KEY)||await raceAndCache();
+      if(!channel)throw new Error('没有可用线路');
+      const url=channel==='tidb'?TIDB_URL:JSON_URL;
+      const res=await fetch(url+'?v='+Date.now());
+      if(!res.ok)throw new Error(channel+' 线路错误 '+res.status);
+      cache=await res.json();
+      return cache;
+    }
+
+    /* =================  查询  ================= */
+    const doQuery=async(strict=false)=>{
+      const kw=input.value.trim();
+      if(!kw)return alert('请至少输入一个关键字！');
+      result.textContent='查询中...';
+      try{
+        const data=await getData();
+        const hit=strict?Zibeichaxun.queryStrict(data,kw):Zibeichaxun.query(data,kw);
+        if(!hit.length)return(result.innerHTML='<p>查不到相关数据</p>');
+
+        const countHtml=`<p style="margin:4px 0;color:#555;">共查到 <strong>${hit.length}</strong> 条记录</p>`;
+        const kwArr=Array.from(kw.replace(/\s+/g,''));
+        const highlight=str=>Array.from(str).map(ch=>kwArr.includes(ch)?`<span class="highlight-key">${ch}</span>`:ch).join('，');
+        let html=countHtml+'<table border="1" cellpadding="6"><tr><th>ID号</th><th>聚居地</th><th>字辈用字</th><th>备注</th></tr>';
+        hit.forEach(({ID号,聚居地,字辈用字,备注})=>{
+          html+=`<tr><td>${ID号}</td><td>${聚居地}</td><td>${highlight(字辈用字)}</td><td>${备注||''}</td></tr>`;
+        });
+        result.innerHTML=html+'</table>';
+      }catch(e){
+        localStorage.removeItem(STORE_KEY);
+        result.innerHTML=`<p style="color:red;">查询出错：${e.message}</p>`;
+      }
+    };
+
+    strictBtn.addEventListener('click',()=>doQuery(true));
+    fuzzyBtn.addEventListener('click',()=>doQuery(false));
+    input.addEventListener('keyup',e=>{if(e.key==='Enter')fuzzyBtn.click();});
+  })();
+  </script>
+
+  <footer class="site-footer">
+    <span class="hit-line">
+      <img class="v-badge" src="https://visitor-badge.laobi.icu/badge?page_id=danding2023.mongo_web">
+    </span>
+  </footer>
+</body>
+</html>
