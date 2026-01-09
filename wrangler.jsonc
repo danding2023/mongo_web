@@ -1,5 +1,6 @@
 {
-  "name": "mongo-web-zibei",
+  // wrangler.jsonc
+"name": "continue-git",
   "compatibility_date": "2026-01-02",
   "pages_build_output_dir": "."
 }
