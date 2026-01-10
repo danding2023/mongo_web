@@ -2,67 +2,94 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TiDB 数据查询</title>
+  <title>字辈聚集地查询</title>
+  <link rel="stylesheet" href="../css/style.css">
   <style>
-    body { padding: 20px; font-family: Arial; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background-color: #f5f5f5; }
+    .search-box{display:flex;flex-direction:column;align-items:flex-start;gap:0;margin-bottom:20px}
+    .search-box input[type=text]{width:240px;padding:6px}
+    .search-box button{width:240px;padding:8px;margin-top:8px}
+    .spacer{height:1.2em}
+.hit-line{
+  font-size: 16px;          /* 文字稍微大一点        */
+  line-height: 32px;        /* 行高 = 图标高度，保证垂直居中 */
+}
+.v-badge{
+  height: 26px;             /* 图标放大到 26px（可再调 28/30） */
+  vertical-align: middle;   /* 文字图标居中对齐       */
+}
   </style>
 </head>
 <body>
-  <h1>TiDB zibeiyugaikuang 表数据</h1>
-  <div id="loading">正在加载数据...</div>
-  <div id="error" style="color: red; display: none;"></div>
-  <table id="dataTable" style="display: none;"></table>
+  <h2>字辈聚集地查询</h2>
+  <p class="note">请在下面的文本框中输入辈分用字（先高辈，再晚辈，依次输入，命中率更高）。</p>
 
+  <div class="search-box">
+    <input type="text" id="key1" placeholder="请输入关键字">
+    <div class="spacer"></div>
+    <button id="strictBtn">精准查询</button>
+    <button id="fuzzyBtn">模糊查询</button>
+  </div>
+  <div id="result"></div>
+ <h3>说明：</h3>
+ <h5>1、所有字辈信息来自网络、史志、典籍及走访收集，仅为字辈寻根者提供线索参考。</h5>
+ <h5>2、备注栏中的数字代表来源，1《四川各地李氏简介》，2网络收集，3延良某《李氏家谱》，4《世界李氏字辈谱10000例》。</h5>
+ <h5>3、收集、整理不易，在此向各收集整理人致以诚挚的谢意！。</h5>
+<script src="/mongo_web/js/zibeichaxun.js"></script>
   <script>
-    // ===== 只改这一行！=====
-    const WORKER_URL = "你的Worker地址"; // 替换成你的Worker访问地址（比如 https://xxx.workers.dev）
-    // =======================
+  (()=>{
+    const strictBtn = document.getElementById('strictBtn');
+    const fuzzyBtn  = document.getElementById('fuzzyBtn');
+    const input     = document.getElementById('key1');
+    const result    = document.getElementById('result');
 
-    // 加载数据
-    fetch(WORKER_URL)
-      .then(res => res.json())
-      .then(data => {
-        if (data.code === 200) {
-          document.getElementById("loading").style.display = "none";
-          const table = document.getElementById("dataTable");
-          table.style.display = "table";
+    const doQuery = async (strict = false) => {
+      const kw = input.value.trim();
+      if (!kw) return alert('请至少输入一个关键字！');
+      result.textContent = '查询中...';
+      try {
+        const res = await fetch('https://datagate.271776169.workers.dev/zibeiyugaikuang.json?v=' + Date.now());
+        if (!res.ok) throw new Error('网络错误 ' + res.status);
+        const data = await res.json();
 
-          // 生成表头
-          if (data.data.length > 0) {
-            const thead = table.createTHead();
-            const headerRow = thead.insertRow();
-            Object.keys(data.data[0]).forEach(key => {
-              const th = document.createElement("th");
-              th.textContent = key;
-              headerRow.appendChild(th);
-            });
+        const hit = strict ? Zibeichaxun.queryStrict(data, kw)
+                           : Zibeichaxun.query(data, kw);
 
-            // 生成数据行
-            data.data.forEach(row => {
-              const tr = table.insertRow();
-              Object.values(row).forEach(value => {
-                const td = tr.insertCell();
-                td.textContent = value || "";
-              });
-            });
-          } else {
-            table.innerHTML = "<tr><td colspan='100'>暂无数据</td></tr>";
-          }
-        } else {
-          document.getElementById("loading").style.display = "none";
-          document.getElementById("error").textContent = "查询失败：" + data.msg;
-          document.getElementById("error").style.display = "block";
-        }
-      })
-      .catch(err => {
-        document.getElementById("loading").style.display = "none";
-        document.getElementById("error").textContent = "网络错误：" + err.message;
-        document.getElementById("error").style.display = "block";
-      });
+        if (!hit.length) return (result.innerHTML = '<p>查不到相关数据</p>');
+
+        const countHtml = `<p style="margin:4px 0;color:#555;">共查到 <strong>${hit.length}</strong> 条记录</p>`;
+        const kwArr = Array.from(kw.replace(/\s+/g,''));
+        const highlight = str => Array.from(str).map(ch =>
+          kwArr.includes(ch) ? `<span class="highlight-key">${ch}</span>` : ch
+        );
+
+        let html = countHtml +
+          '<table border="1" cellpadding="6">' +
+          '<tr><th>ID号</th><th>聚居地</th><th>字辈用字</th><th>备注</th></tr>';
+        hit.forEach(({ ID号, 聚居地, 字辈用字, 备注 }) => {
+          const highlighted = highlight(字辈用字).join('，');
+          html += `<tr>
+                     <td>${ID号}</td>
+                     <td>${聚居地}</td>
+                     <td>${highlighted}</td>
+                     <td>${备注||''}</td>
+                   </tr>`;
+        });
+        result.innerHTML = html + '</table>';
+      } catch (e) {
+        result.innerHTML = `<p style="color:red;">查询出错：${e.message}</p>`;
+      }
+    };
+
+    strictBtn.addEventListener('click', () => doQuery(true));
+    fuzzyBtn.addEventListener('click',  () => doQuery(false));
+    input.addEventListener('keyup', e => { if (e.key === 'Enter') fuzzyBtn.click(); });
+  })();
   </script>
+<footer class="site-footer">
+  <span class="hit-line">
+ <img class="v-badge" src="https://visitor-badge.laobi.icu/badge?page_id=danding2023.mongo_web">
+  </span>
+</footer>
+
 </body>
 </html>
