@@ -58,7 +58,7 @@
 
     async function raceAndCache(){
       const ctrl  = new AbortController();
-      const timer = setTimeout(()=>ctrl.abort(),30000); // 放宽到 5或10秒或30秒
+      const timer = setTimeout(()=>ctrl.abort(),60000); // 放宽到 5或10秒或30秒或60秒
       const start = performance.now();
       let tidbTime=null,jsonTime=null,tidbOK=false,jsonOK=false,tidbData=null,jsonData=null;
 
