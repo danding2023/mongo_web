@@ -43,8 +43,8 @@
     const channelInfo = document.getElementById('channelInfo');
 
     /* ========== ① 真正的数据接口当测速 + 缓存 ========== */
-    const TIDB_URL = 'https://datagate.271776169.workers.dev/zibeiyugaikuang.json';
-    const JSON_URL = 'https://datagate.271776169.workers.dev/zibeiyugaikuang.json';
+    const TIDB_URL = 'https://zibei-data-api.271776169.workers.dev/zibeiyugaikuang.json';
+    const JSON_URL = 'https://zibei-data-api.271776169.workers.dev/zibeiyugaikuang.json';
     const STORE_KEY = 'fast_channel';
     let currentChannel = localStorage.getItem(STORE_KEY);
     let cache = null; // 全局缓存，拉一次后永久复用
