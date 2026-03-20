@@ -273,27 +273,40 @@ iframe {
   margin-top: 8px;
   border-radius: 2px;
 }
-
 /* =========================================================
-   📱 移动端统一适配（最终唯一版本）
+   📱 移动端统一适配（最终修正版）
    ========================================================= */
 @media (max-width: 768px) {
-/* 🔥 一定放在 @media 里面最前面 */
-#result table thead,
-#zibeiTable thead {
-  display: none !important;
-}
-#result th,
-#zibeiTable th {
-  display: none !important;
-}
 
-  /* ===== 页面整体 ===== */
-  iframe, #result {
+  /* =====================================================
+     🔥 1. 先处理 iframe（必须最前）
+     ===================================================== */
+  iframe {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  /* =====================================================
+     🔥 2. 彻底干掉所有表头（只保留一套）
+     ===================================================== */
+  #result thead,
+  #zibeiTable thead,
+  #result th,
+  #zibeiTable th {
+    display: none !important;
+  }
+
+  /* =====================================================
+     页面整体
+     ===================================================== */
+  #result {
     width: 95%;
   }
 
-  /* ===== 标题 ===== */
+  /* =====================================================
+     标题
+     ===================================================== */
   .site-title {
     font-size: 24px;
     letter-spacing: 2px;
@@ -309,58 +322,39 @@ iframe {
     gap: 10px;
   }
 
-  /* ===== 搜索框 ===== */
-.search-box {
-  max-width: 95%;
-  flex-direction: column;
-  border-radius: 12px;
-  overflow: hidden;
-
-  display: flex;        /* 🔥 确保生效 */
-  gap: 12px;            /* 🔥 用 gap 统一间距（替代 margin） */
-}
-
-/* ===== 输入框（重点放大） ===== */
-.search-box input[type="text"] {
-  height: 68px;              /* 🔥 从56 → 68（明显变大） */
-  box-sizing: border-box;    /* 🔥 关键：防止视觉变矮 */
-  font-size: 18px;           /* 🔥 字体同步放大 */
-  padding: 0 18px;
-  border-radius: 8px;
-}
-
-/* ===== 按钮 ===== */
-.search-box button {
-  height: 56px;              /* 保持略小，形成层级 */
-  box-sizing: border-box;    /* 🔥 保证一致 */
-  font-size: 16px;
-  width: 100%;
-  border-left: none;
-  border-top: 1px solid #eee;
-  border-radius: 8px;
-}
-
-/* ❌ 删除这两行（避免间距叠加）
-margin-bottom: 10px;
-.search-box button + button { margin-top: 6px; }
-*/
   /* =====================================================
-     🔥 表格 → 卡片（核心功能）
+     搜索框（已优化版）
      ===================================================== */
+  .search-box {
+    max-width: 95%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
 
-/* 隐藏全量表（手机端不需要） */
-iframe {
-  display: none;
- height: 0;
-}
- /* 隐藏所有表头 */
- #result table thead,
-#zibeiTable thead {
-  display: none;
-}
-#zibeiTable th {
-  display: none;
-}
+  .search-box input[type="text"] {
+    height: 68px;
+    box-sizing: border-box;
+    font-size: 18px;
+    padding: 0 18px;
+    border-radius: 8px;
+  }
+
+  .search-box button {
+    height: 56px;
+    box-sizing: border-box;
+    font-size: 16px;
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid #eee;
+    border-radius: 8px;
+  }
+
+  /* =====================================================
+     🔥 表格 → 卡片
+     ===================================================== */
 
   #result table,
   #result tbody {
