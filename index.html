@@ -14,17 +14,14 @@
 
 <main>
 
-  <!-- 搜索框 -->
   <div class="search-box">
     <input type="text" id="key1" placeholder="请输入关键字">
     <button id="searchBtn">精准查询</button>
     <button id="fuzzyBtn">模糊查询</button>
   </div>
 
-  <!-- iframe 显示原页面 -->
   <iframe id="contentFrame" name="contentFrame" src="pages/all_zibei.html"></iframe>
 
-  <!-- 查询结果 -->
   <div id="result"></div>
 
 </main>
@@ -36,24 +33,22 @@
   </span>
 </footer>
 
-<!-- 外部查询逻辑（必须保留） -->
 <script src="/mongo_web/js/zibeichaxun.js"></script>
 
-<!-- iframe 自适应高度 -->
+<!-- iframe 自动高度 -->
 <script>
-  const iframe = document.getElementById('contentFrame');
-
-  iframe.addEventListener('load', () => {
-    try {
-      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-      iframe.style.height = iframeDoc.body.scrollHeight + 'px';
-    } catch(e) {
-      console.warn('iframe 高度自适应失败（可能跨域）', e);
-    }
-  });
+const iframe = document.getElementById('contentFrame');
+iframe.addEventListener('load', () => {
+  try {
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    iframe.style.height = doc.body.scrollHeight + 'px';
+  } catch(e) {
+    console.warn('iframe 高度失败', e);
+  }
+});
 </script>
 
-<!-- 精简后的查询逻辑 -->
+<!-- 查询逻辑 -->
 <script>
 (() => {
   const strictBtn = document.getElementById('searchBtn');
@@ -65,7 +60,6 @@
 
   let cache = null;
 
-  // ===== 获取数据 =====
   async function getData(){
     if(cache) return cache;
 
@@ -78,7 +72,6 @@
     return cache;
   }
 
-  // ===== 查询 =====
   const doQuery = async(strict=false)=>{
     const kw = input.value.trim();
     if(!kw) return alert('请至少输入一个关键字！');
@@ -87,17 +80,27 @@
 
     try{
       const data = await getData();
-      const hit = strict ? Zibeichaxun.queryStrict(data,kw)
-                         : Zibeichaxun.query(data,kw);
+
+      // ✅ 修复：模糊查询必须用数组
+      const hit = strict
+        ? Zibeichaxun.queryStrict(data, kw)
+        : Zibeichaxun.query(data, Array.from(kw.replace(/\s+/g,'')));
 
       if(!hit.length){
         result.innerHTML = '<p>查不到相关数据</p>';
         return;
       }
 
-      const countHtml = `<p style="margin:4px 0;color:#555;">
-        共查到 <strong>${hit.length}</strong> 条记录。
-      </p>`;
+      // ✅ 恢复说明文字
+      const countHtml = `
+        <p style="margin:4px 0;color:#555;">
+        共查到 <strong>${hit.length}</strong> 条记录。备注栏中的数字代表信息来源：
+        1《四川各地李氏简介》，2 网络收集，3 延良《李氏家谱》，
+        4《世界李氏字辈谱 10000 例》。
+        所有字辈信息仅供寻根者作为线索参考使用，
+        资料收集、整理不易，在此向各位收集整理人致以诚挚的谢意！
+        </p>
+      `;
 
       const kwArr = Array.from(kw.replace(/\s+/g,''));
       const highlight = str =>
@@ -118,14 +121,13 @@
         </tr>`;
       });
 
-      result.innerHTML = html + '</table>';
+      result.innerHTML = html + '</table';
 
     }catch(e){
       result.innerHTML = `<p style="color:red;">查询出错：${e.message}</p>`;
     }
   };
 
-  // ===== 事件 =====
   strictBtn.addEventListener('click',()=>doQuery(true));
   fuzzyBtn.addEventListener('click',()=>doQuery(false));
   input.addEventListener('keyup',e=>{
