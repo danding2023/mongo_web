@@ -18,10 +18,26 @@
   </div>
 
   <!-- iframe 显示原页面内容 -->
-  <iframe name="contentFrame" src="pages/all_zibei.html"></iframe>
+  <iframe id="contentFrame"  name="contentFrame" src="pages/all_zibei.html"></iframe>
 
   <!-- 查询结果显示在 iframe 下方 -->
   <div id="result"></div>
+
+<!-- 自动高度 JS 放在这里 -->
+<script>
+  const iframe = document.getElementById('contentFrame');
+
+  iframe.addEventListener('load', () => {
+    try {
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+      const contentHeight = iframeDoc.body.scrollHeight;
+      iframe.style.height = contentHeight + 'px';
+    } catch(e) {
+      console.warn('无法自动调整 iframe 高度（跨域？）', e);
+    }
+  });
+</script>
+
 </main>
 
 <footer>
