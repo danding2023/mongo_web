@@ -309,17 +309,23 @@ iframe {
   }
 
   .search-box input[type="text"] {
-    height: 50px;
-    font-size: 15px;
+  height: 56px;           /* 🔥 从50 → 56 */
+  font-size: 16px;
+  padding: 0 16px;
   }
 
   .search-box button {
+  height: 52px;           /* 🔥 新增高度 */
+
+  padding: 0;
     width: 100%;
-    font-size: 14px;
+    font-size: 16px;
     border-left: none;
     border-top: 1px solid #eee;
   }
-
+.search-box button + button {
+  margin-top: 6px;
+}
   /* =====================================================
      🔥 表格 → 卡片（核心功能）
      ===================================================== */
