@@ -15,15 +15,45 @@ html, body {
 
 /* ---- Header ---- */
 header {
-  height: 80px;
+  height: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
   background: #fff;
+
   border-bottom: 1px solid #eee;
-  font-size: 32px;
-  font-weight: bold;
+
+  /* 🔥 subtle渐变背景 */
+  background: linear-gradient(to bottom, #ffffff, #fafafa);
   color: #222;
+/* =========================================================
+   🏛️ 标题（文化风格）
+   ========================================================= */
+
+.site-title {
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: 4px;              /* 🔥 拉开字距（更有气质） */
+  color: #2c2c2c;
+font-family: "Noto Serif SC", "Microsoft YaHei", serif;
+  /* 🔥 轻微书卷感渐变 */
+  background: linear-gradient(90deg, #222, #555);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  position: relative;
+}
+
+/* 🔥 下方装饰线（关键点） */
+.site-title::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: #d4af37;              /* 🔥 金色（家族/传统感） */
+  margin: 10px auto 0;
+  border-radius: 2px;
+}
 }
 
 /* ---- Footer ---- */
