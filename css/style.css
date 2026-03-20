@@ -301,34 +301,40 @@ iframe {
   }
 
   /* ===== 搜索框 ===== */
-  .search-box {
-    max-width: 95%;
-    flex-direction: column;
-    border-radius: 12px;
-    overflow: hidden;
-  }
+.search-box {
+  max-width: 95%;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
 
-/* ===== 输入框 ===== */
+  display: flex;        /* 🔥 确保生效 */
+  gap: 12px;            /* 🔥 用 gap 统一间距（替代 margin） */
+}
+
+/* ===== 输入框（重点放大） ===== */
 .search-box input[type="text"] {
-  height: 56px;           /* 🔥 统一为56，更协调 */
-  margin-bottom: 10px;
-  font-size: 16px;
-  padding: 0 16px;
+  height: 68px;              /* 🔥 从56 → 68（明显变大） */
+  box-sizing: border-box;    /* 🔥 关键：防止视觉变矮 */
+  font-size: 18px;           /* 🔥 字体同步放大 */
+  padding: 0 18px;
+  border-radius: 8px;
 }
 
 /* ===== 按钮 ===== */
 .search-box button {
-  height: 56px;           /* 🔥 与输入框完全一致 */
+  height: 56px;              /* 保持略小，形成层级 */
+  box-sizing: border-box;    /* 🔥 保证一致 */
   font-size: 16px;
   width: 100%;
   border-left: none;
   border-top: 1px solid #eee;
+  border-radius: 8px;
 }
 
-/* 按钮之间间距 */
-.search-box button + button {
-  margin-top: 6px;
-}
+/* ❌ 删除这两行（避免间距叠加）
+margin-bottom: 10px;
+.search-box button + button { margin-top: 6px; }
+*/
   /* =====================================================
      🔥 表格 → 卡片（核心功能）
      ===================================================== */
