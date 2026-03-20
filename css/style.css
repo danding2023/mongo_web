@@ -324,9 +324,19 @@ iframe {
      🔥 表格 → 卡片（核心功能）
      ===================================================== */
 
-  #result table thead {
-    display: none;
-  }
+/* 隐藏全量表（手机端不需要） */
+iframe {
+  display: none;
+ height: 0;
+}
+ /* 隐藏所有表头 */
+ #result table thead,
+#zibeiTable thead {
+  display: none;
+}
+#zibeiTable th {
+  display: none;
+}
 
   #result table,
   #result tbody {
