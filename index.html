@@ -5,89 +5,179 @@
     <title>中华李氏字辈查询系统</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-/* ---- 基础复位 ---- */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-html, body { height: 100%; }
-
-/* ---- 顶部栏 ---- */
-header {
-    height: 60px;                /* 固定高度 */
-    background: #f0f0f0;
-    display: flex;               /* 垂直+水平居中 */
-    align-items: center;
-    justify-content: center;
-    font-size: 32px;             /* 2号字 ≈ 32px */
-    color: red;
-}
-
-/* ---- 底部栏 ---- */
-footer {
-    height: 60px;
-    background: #f0f0f0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* ---- 主内容区 ---- */
-main {
-    height: calc(100% - 120px);  /* 占满剩余高度（120=上60+下60） */
-    display: flex;
-}
-
-/* ---- 左侧导航 ---- */
-nav {
-    width: 256px;                /* 16个汉字宽（16px×16） */
-    background: #e0e0e0;
-    padding: 10px;
-    text-align: center;          /* 文字水平居中 */
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
+    /* ---- 全局复位 ---- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-nav a {
-    display: inline-block;
-    width: 100%;
-    margin: 5px 0;
-}
 
-/* ---- 右侧内容 ---- */
-iframe {
-    flex: 1;                     /* 剩余空间全部给它 */
-    border: none;
-}
-.hit-line{
-  font-size: 16px;          /* 文字稍微大一点        */
-  line-height: 32px;        /* 行高 = 图标高度，保证垂直居中 */
-}
-.v-badge{
-  height: 26px;             /* 图标放大到 26px（可再调 28/30） */
-  vertical-align: middle;   /* 文字图标居中对齐       */
-}
+    html, body {
+      height: 100%;
+      font-family: "Microsoft YaHei", sans-serif;
+      background: #fff;
+      color: #333;
+    }
+
+    /* ---- 顶部 Header ---- */
+    header {
+      height: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #fff;
+      border-bottom: 1px solid #eee;
+      font-size: 32px;
+      font-weight: bold;
+      color: #222;
+    }
+
+    /* ---- 底部 Footer ---- */
+    footer {
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #f7f7f7;
+      font-size: 14px;
+      color: #888;
+      border-top: 1px solid #eee;
+    }
+
+    footer .hit-line img.v-badge {
+      margin-left: 8px;
+      vertical-align: middle;
+      height: 26px;
+    }
+
+    /* ---- 主内容区域 ---- */
+    main {
+      height: calc(100% - 140px); /* 140 = header 80 + footer 60 */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background: #fff;
+    }
+
+    /* ---- iframe 区域 ---- */
+    iframe {
+      width: 80%;
+      max-width: 1000px;
+      height: 600px;
+      border: none;
+      border-radius: 4px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    }
+
+    /* ---- 可选：搜索框样式 ---- */
+    .search-box {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      margin: 20px 0;
+    }
+
+    .search-box input[type="text"] {
+      flex: 1;
+      height: 40px;
+      font-size: 18px;
+      padding: 0 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px 0 0 4px;
+      outline: none;
+    }
+
+    .search-box button {
+      width: 100px;
+      border: none;
+      background-color: #3385ff;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .search-box button:hover {
+      background-color: #2670d6;
+    }
+
+    /* ---- 字辈表格 & 控件保持原有样式 ---- */
+    :root {
+      --key-bg-color: #ffeb3b;
+      --key-ft-color: #d32f2f;
+      --table-border: 1px solid #000;
+      --table-padding: 4px 6px;
+      --font-size-up: 18px;
+      --btn-color: #d32f2f;
+      --btn-letter-space: 1px;
+      --stripe-even: #fafafa;
+    }
+
+    .highlight-key {
+      background-color: var(--key-bg-color);
+      color: var(--key-ft-color);
+      font-weight: bold;
+      padding: 0 2px;
+      border-radius: 2px;
+    }
+
+    #result table,
+    #zibeiTable {
+      border-collapse: collapse;
+      border: var(--table-border);
+    }
+
+    #result table th,
+    #zibeiTable th {
+      border: var(--table-border);
+      padding: var(--table-padding);
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    #result table td,
+    #zibeiTable td {
+      border: var(--table-border);
+      padding: var(--table-padding);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    #result table tbody tr:nth-child(even),
+    #zibeiTable tbody tr:nth-child(even) {
+      background-color: var(--stripe-even);
+    }
+
+    #key1, #key2, #key3, #key4, #key5, #searchBtn {
+      font-size: var(--font-size-up);
+    }
+
+    #searchBtn {
+      color: var(--btn-color);
+      font-weight: bold;
+      letter-spacing: var(--btn-letter-space);
+    }
     </style>
 </head>
 <body>
     <header><h2>中华李氏字辈查询系统 - 首页</h2></header>
     <main>
-        <nav>
-             <a href="pages/all_zibei.html" target="contentFrame">字辈示例</a>        
-             <a href="pages/zibeichaxun.html" target="contentFrame">字辈查询</a>
-    <!--         <a href="pages/manage_zibei.html" target="contentFrame">字辈修改（建设中）</a>-->
-      <!--          <a href="#" target="contentFrame">家谱展播（建设中）</a>         -->
-      <!--        <a href="#" target="contentFrame">李氏先祖（建设中）</a>-->
-    <!--         <a href="#" target="contentFrame">李氏文化（建设中）</a>  -->         
-       <!--      <a href="#" target="contentFrame">修谱工具（建设中）</a>-->        
-       <!--       <a href="#" target="contentFrame">他姓字辈（建设中）</a>-->
-     <!--        <a href="#" target="contentFrame">他姓文化（建设中）</a> -->
-                
-        </nav>
+        <!-- 可选搜索框（百度风格） -->
+        <div class="search-box">
+            <input type="text" placeholder="请输入字辈关键字..." id="key1">
+            <button id="searchBtn">查询</button>
+        </div>
+
+        <!-- iframe 保留原内容 -->
         <iframe name="contentFrame" src="pages/all_zibei.html"></iframe>
     </main>
-    <footer>© 2025 中华李氏字辈查询系统
-  <span class="hit-line">
-    <img class="v-badge" src="https://visitor-badge.laobi.icu/badge?page_id=danding2023.mongo_web">
-  </span>
-</footer>
+    <footer>
+        © 2025 中华李氏字辈查询系统
+        <span class="hit-line">
+            <img class="v-badge" src="https://visitor-badge.laobi.icu/badge?page_id=danding2023.mongo_web">
+        </span>
+    </footer>
 </body>
 </html>
