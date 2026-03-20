@@ -308,21 +308,24 @@ iframe {
     overflow: hidden;
   }
 
-  .search-box input[type="text"] {
-  height: 56px;           /* 🔥 从50 → 56 */
+/* ===== 输入框 ===== */
+.search-box input[type="text"] {
+  height: 56px;           /* 🔥 统一为56，更协调 */
+  margin-bottom: 10px;
   font-size: 16px;
   padding: 0 16px;
-  }
+}
 
-  .search-box button {
-  height: 52px;           /* 🔥 新增高度 */
+/* ===== 按钮 ===== */
+.search-box button {
+  height: 56px;           /* 🔥 与输入框完全一致 */
+  font-size: 16px;
+  width: 100%;
+  border-left: none;
+  border-top: 1px solid #eee;
+}
 
-  padding: 0;
-    width: 100%;
-    font-size: 16px;
-    border-left: none;
-    border-top: 1px solid #eee;
-  }
+/* 按钮之间间距 */
 .search-box button + button {
   margin-top: 6px;
 }
