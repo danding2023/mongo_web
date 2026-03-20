@@ -164,11 +164,12 @@
 <body>
     <header><h2>中华李氏字辈查询系统 - 首页</h2></header>
     <main>
-        <!-- 可选搜索框（百度风格） -->
-        <div class="search-box">
-            <input type="text" placeholder="请输入字辈关键字..." id="key1">
-            <button id="searchBtn">查询</button>
-        </div>
+<!-- 原来的搜索框修改为双按钮 -->
+<div class="search-box">
+    <input type="text" placeholder="请输入字辈关键字..." id="key1">
+    <button id="searchBtn">精准查询</button>
+    <button id="fuzzyBtn">模糊查询</button>
+</div>
 
         <!-- iframe 保留原内容 -->
         <iframe name="contentFrame" src="pages/all_zibei.html"></iframe>
