@@ -57,7 +57,17 @@ iframe {
 }
 
 /* 查询结果区域 */
-#result { width:80%; max-width:1000px; margin-top:10px; }
+#result {
+  width: 80%;           /* 保留原有宽度 */
+  max-width: 1000px;
+  margin-top: 10px;
+  max-height: 400px;    /* 查询结果最大高度 */
+  overflow-y: auto;     /* 超出自动出现滚动条 */
+  border: 1px solid #eee; /* 可选，美观 */
+  padding: 8px;         /* 可选，内容与边框间距 */
+  border-radius: 4px;   /* 可选，圆角 */
+}
+
 .highlight-key { background:#ffeb3b; color:#000; font-weight:bold; }
 #result table { border-collapse:collapse; width:100%; }
 #result table th, #result table td { border:1px solid #000; padding:6px; text-align:left; vertical-align:middle; }
