@@ -67,7 +67,7 @@ iframe {
 /* ---- 搜索框样式 ---- */
 .search-box {
   width: 100%;
-  max-width: 650px;  /* 调大一点容纳两个按钮 */
+  max-width: 600px;
   display: flex;
   margin: 20px 0;
 }
@@ -83,37 +83,19 @@ iframe {
   box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
 }
 
-/* 精准查询按钮 */
-.search-box button#searchBtn {
-  width: 120px;
+.search-box button {
+  width: 100px;
   border: none;
   background-color: #3385ff;
   color: #fff;
   font-size: 18px;
   cursor: pointer;
-  border-radius: 0;  /* 左边圆角由 input 控制 */
+  border-radius: 0 4px 4px 0;
   transition: background-color 0.2s;
 }
 
-.search-box button#searchBtn:hover {
+.search-box button:hover {
   background-color: #1966cc;
-}
-
-/* 模糊查询按钮 */
-.search-box button#fuzzyBtn {
-  width: 120px;
-  border: none;
-  background-color: #56c0ff;   /* 略浅的蓝色与前按钮区分 */
-  color: #fff;
-  font-size: 18px;
-  cursor: pointer;
-  border-radius: 0 4px 4px 0;  /* 最右边圆角 */
-  transition: background-color 0.2s;
-  margin-left: 4px; /* 两按钮间距 */
-}
-
-.search-box button#fuzzyBtn:hover {
-  background-color: #3399e6;
 }
 
 /* ---- 字辈表格 & 控件保持原有样式 ---- */
