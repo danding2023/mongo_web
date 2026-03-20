@@ -218,84 +218,6 @@ iframe {
 }
 
 /* =========================================================
-   📱 响应式
-   ========================================================= */
-
-/* =========================================================
-   📱 平板及以下（结构变化）
-   ========================================================= */
-@media (max-width: 768px) {
-
-  /* 内容宽度稍收紧 */
-  iframe, #result {
-    width: 95%;
-  }
-
-  /* 搜索框改为竖排 */
-  .search-box {
-    flex-direction: column;
-    border-radius: 12px;
-    overflow: hidden;
-  }
-
-  /* 输入框 */
-  .search-box input[type="text"] {
-    height: 52px;
-    font-size: 16px;
-  }
-
-  /* 按钮变整行 */
-  .search-box button {
-    width: 100%;
-    border-left: none;
-    border-top: 1px solid #eee;
-  }
-}
-
-
-/* =========================================================
-   📱 手机（细节优化）
-   ========================================================= */
-@media (max-width: 600px) {
-
-  /* 标题缩小 */
-  .site-title {
-    font-size: 24px;
-    letter-spacing: 2px;
-  }
-
-  /* 印章缩小 */
-  .seal {
-    width: 42px;
-    height: 42px;
-    font-size: 20px;
-  }
-
-  /* 标题与印章间距 */
-  .title-wrap {
-    gap: 10px;
-  }
-
-  /* 搜索框更紧凑 */
-  .search-box {
-    max-width: 95%;
-  }
-
-  /* 输入框再优化 */
-  .search-box input[type="text"] {
-    height: 50px;
-    font-size: 15px;
-    padding: 0 14px;
-  }
-
-  /* 按钮字体稍小 */
-  .search-box button {
-    font-size: 14px;
-    padding: 10px 0;
-  }
-}
-
-/* =========================================================
    🏛️ 标题 + 印章 Logo
    ========================================================= */
 
@@ -353,26 +275,67 @@ iframe {
 }
 
 /* =========================================================
-   📱 手机端：表格 → 卡片 + 备注优化（最终版）
+   📱 移动端统一适配（最终唯一版本）
    ========================================================= */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
 
-  /* ❌ 去掉表头 */
+  /* ===== 页面整体 ===== */
+  iframe, #result {
+    width: 95%;
+  }
+
+  /* ===== 标题 ===== */
+  .site-title {
+    font-size: 24px;
+    letter-spacing: 2px;
+  }
+
+  .seal {
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+  }
+
+  .title-wrap {
+    gap: 10px;
+  }
+
+  /* ===== 搜索框 ===== */
+  .search-box {
+    max-width: 95%;
+    flex-direction: column;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .search-box input[type="text"] {
+    height: 50px;
+    font-size: 15px;
+  }
+
+  .search-box button {
+    width: 100%;
+    font-size: 14px;
+    border-left: none;
+    border-top: 1px solid #eee;
+  }
+
+  /* =====================================================
+     🔥 表格 → 卡片（核心功能）
+     ===================================================== */
+
   #result table thead {
     display: none;
   }
 
-  /* 表格整体块化 */
   #result table,
-  #result tbody,
-  #result tr,
-  #result td {
+  #result tbody {
     display: block;
     width: 100%;
   }
 
-  /* 每条记录卡片 */
   #result tr {
+    display: block;
     margin-bottom: 12px;
     border: 1px solid #eee;
     border-radius: 8px;
@@ -381,12 +344,11 @@ iframe {
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
   }
 
-  /* 每行字段 */
   #result td {
+    display: block;
     padding: 6px 4px;
     border: none;
     border-bottom: 1px dashed #eee;
-    position: relative;
     font-size: 15px;
     line-height: 1.6;
   }
@@ -395,7 +357,7 @@ iframe {
     border-bottom: none;
   }
 
-  /* 字段标签 */
+  /* 字段名 */
   #result td:nth-child(1)::before {
     content: "ID号：";
     font-weight: bold;
@@ -418,22 +380,6 @@ iframe {
     content: "备注：";
     font-weight: bold;
     color: #666;
-  }
-
-  /* 🔥 备注优化（自动省略 + 展开） */
-  #result td:nth-child(4) {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;           /* 默认显示2行 */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    position: relative;
-  }
-
-  /* 点击展开（利用 active） */
-  #result td:nth-child(4):active {
-    -webkit-line-clamp: unset;
-    overflow: visible;
-    background: #fafafa;
   }
 
 }
