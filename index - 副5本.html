@@ -4,6 +4,82 @@
 <meta charset="UTF-8">
 <title>中华李氏字辈查询系统</title>
 <link rel="stylesheet" href="css/style.css">
+<style>
+/* ---- 全局复位 ---- */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; font-family: "Microsoft YaHei", sans-serif; background:#fff; color:#333; }
+
+/* ---- 顶部 Header ---- */
+header {
+  height: 80px;
+  display: flex; justify-content: center; align-items: center;
+  background: #fff; border-bottom:1px solid #eee;
+  font-size:32px; font-weight:bold; color:#222;
+}
+
+/* ---- 主内容区域 ---- */
+main {
+  display:flex; flex-direction: column; align-items:center;
+  padding:60px 20px; background:#fff;
+}
+
+/* ---- 搜索框 ---- */
+.search-box {
+  width:100%; max-width:650px; display:flex; margin-bottom:20px;
+}
+
+.search-box input[type="text"] {
+  flex:1; height:40px; font-size:18px; padding:0 12px;
+  border:1px solid #ccc; border-radius:4px 0 0 4px; outline:none;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* 精准查询按钮 */
+.search-box button#searchBtn {
+  width:120px; border:none; background-color:#3385ff; color:#fff;
+  font-size:18px; cursor:pointer; border-radius:0; transition:0.2s;
+}
+.search-box button#searchBtn:hover { background-color:#1966cc; }
+
+/* 模糊查询按钮 */
+.search-box button#fuzzyBtn {
+  width:120px; border:none; background-color:#56c0ff; color:#fff;
+  font-size:18px; cursor:pointer; border-radius:0 4px 4px 0; margin-left:4px;
+  transition:0.2s;
+}
+.search-box button#fuzzyBtn:hover { background-color:#3399e6; }
+
+/* iframe 区域 */
+iframe {
+  width:80%; max-width:1000px; height:400px;
+  border:none; border-radius:4px; box-shadow:0 0 8px rgba(0,0,0,0.05);
+  margin-bottom:20px;
+}
+
+/* 查询结果区域 */
+#result {
+  width: 80%;           /* 保留原有宽度 */
+  max-width: 1000px;
+  margin-top: 10px;
+  max-height: 400px;    /* 查询结果最大高度 */
+  overflow-y: auto;     /* 超出自动出现滚动条 */
+  border: 1px solid #eee; /* 可选，美观 */
+  padding: 8px;         /* 可选，内容与边框间距 */
+  border-radius: 4px;   /* 可选，圆角 */
+}
+
+.highlight-key { background:#ffeb3b; color:#000; font-weight:bold; }
+#result table { border-collapse:collapse; width:100%; }
+#result table th, #result table td { border:1px solid #000; padding:6px; text-align:left; vertical-align:middle; }
+#result table th { text-align:center; }
+
+/* 底部 Footer */
+footer {
+  height:60px; display:flex; justify-content:center; align-items:center;
+  background:#f7f7f7; font-size:14px; color:#888; border-top:1px solid #eee;
+}
+footer .hit-line img.v-badge { margin-left:8px; vertical-align:middle; height:26px; }
+</style>
 </head>
 <body>
 
@@ -117,24 +193,30 @@
   };
 
   strictBtn.addEventListener('click',()=>doQuery(true));
-
-  fuzzyBtn.addEventListener('click', async ()=>{
+ 
+fuzzyBtn.addEventListener('click', async ()=>{
     const kw = input.value.trim();
     if(!kw) return alert('请至少输入一个关键字！');
+
+    // 直接调用 query 方法
+    // 关键修改：把关键字拆成数组传入 Zibeichaxun.query
     const hit = Zibeichaxun.query(await getData(), Array.from(kw.replace(/\s+/g,'')));
+
     if(!hit.length){
         result.innerHTML = '<p>查不到相关数据</p>';
         return;
     }
+
     const countHtml = `<p style="margin:4px 0;color:#555;">共查到 <strong>${hit.length}</strong> 条记录</p>`;
     const kwArr = Array.from(kw.replace(/\s+/g,''));
     const highlight = str => Array.from(str).map(ch => kwArr.includes(ch)?`<span class="highlight-key">${ch}</span>`:ch).join('，');
+
     let html = countHtml+'<table border="1" cellpadding="6"><tr><th>ID号</th><th>聚居地</th><th>字辈用字</th><th>备注</th></tr>';
     hit.forEach(({ID号,聚居地,字辈用字,备注})=>{
         html += `<tr><td>${ID号}</td><td>${聚居地}</td><td>${highlight(字辈用字)}</td><td>${备注||''}</td></tr>`;
     });
     result.innerHTML = html+'</table>';
-  });
+});
 
   input.addEventListener('keyup',e=>{if(e.key==='Enter') fuzzyBtn.click();});
 })();

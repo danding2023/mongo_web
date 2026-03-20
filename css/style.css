@@ -6,12 +6,12 @@
 }
 
 html, body {
-    font-family: "Microsoft YaHei", sans-serif;
+  font-family: "Microsoft YaHei", sans-serif;
   background: #fff;
   color: #333;
-  height:auto;
-  min-height:100%;
-  overflow-y:auto;
+  height: auto;
+  min-height: 100%;
+  overflow-y: auto;
 }
 
 /* ---- 顶部 Header ---- */
@@ -64,12 +64,13 @@ iframe {
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 8px rgba(0,0,0,0.05);
+  margin-bottom: 20px; /* 保证 iframe 与结果区分开 */
 }
 
 /* ---- 搜索框样式 ---- */
 .search-box {
   width: 100%;
-  max-width: 650px;  /* 调大一点容纳两个按钮 */
+  max-width: 650px;
   display: flex;
   margin: 20px 0;
 }
@@ -93,7 +94,7 @@ iframe {
   color: #fff;
   font-size: 18px;
   cursor: pointer;
-  border-radius: 0;  /* 左边圆角由 input 控制 */
+  border-radius: 0;
   transition: background-color 0.2s;
 }
 
@@ -105,20 +106,20 @@ iframe {
 .search-box button#fuzzyBtn {
   width: 120px;
   border: none;
-  background-color: #56c0ff;   /* 略浅的蓝色与前按钮区分 */
+  background-color: #56c0ff;
   color: #fff;
   font-size: 18px;
   cursor: pointer;
-  border-radius: 0 4px 4px 0;  /* 最右边圆角 */
+  border-radius: 0 4px 4px 0;
   transition: background-color 0.2s;
-  margin-left: 4px; /* 两按钮间距 */
+  margin-left: 4px;
 }
 
 .search-box button#fuzzyBtn:hover {
   background-color: #3399e6;
 }
 
-/* ---- 字辈表格 & 控件保持原有样式 ---- */
+/* ---- 字辈表格 & 查询结果 ---- */
 :root {
   --key-bg-color: #ffeb3b;
   --key-ft-color: #d32f2f;
@@ -138,10 +139,22 @@ iframe {
   border-radius: 2px;
 }
 
+#result {
+  width: 80%;
+  max-width: 1000px;
+  margin-top: 10px;
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  padding: 8px;
+  border-radius: 4px;
+}
+
 #result table,
 #zibeiTable {
   border-collapse: collapse;
   border: var(--table-border);
+  width: 100%;
 }
 
 #result table th,
@@ -165,6 +178,7 @@ iframe {
   background-color: var(--stripe-even);
 }
 
+/* 输入框与按钮字体 */
 #key1, #key2, #key3, #key4, #key5, #searchBtn {
   font-size: var(--font-size-up);
 }
