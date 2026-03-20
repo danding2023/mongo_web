@@ -351,3 +351,89 @@ iframe {
   margin-top: 8px;
   border-radius: 2px;
 }
+
+/* =========================================================
+   📱 手机端：表格 → 卡片 + 备注优化（最终版）
+   ========================================================= */
+@media (max-width: 600px) {
+
+  /* ❌ 去掉表头 */
+  #result table thead {
+    display: none;
+  }
+
+  /* 表格整体块化 */
+  #result table,
+  #result tbody,
+  #result tr,
+  #result td {
+    display: block;
+    width: 100%;
+  }
+
+  /* 每条记录卡片 */
+  #result tr {
+    margin-bottom: 12px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 10px;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  }
+
+  /* 每行字段 */
+  #result td {
+    padding: 6px 4px;
+    border: none;
+    border-bottom: 1px dashed #eee;
+    position: relative;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  #result td:last-child {
+    border-bottom: none;
+  }
+
+  /* 字段标签 */
+  #result td:nth-child(1)::before {
+    content: "ID号：";
+    font-weight: bold;
+    color: #666;
+  }
+
+  #result td:nth-child(2)::before {
+    content: "聚居地：";
+    font-weight: bold;
+    color: #666;
+  }
+
+  #result td:nth-child(3)::before {
+    content: "字辈：";
+    font-weight: bold;
+    color: #666;
+  }
+
+  #result td:nth-child(4)::before {
+    content: "备注：";
+    font-weight: bold;
+    color: #666;
+  }
+
+  /* 🔥 备注优化（自动省略 + 展开） */
+  #result td:nth-child(4) {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;           /* 默认显示2行 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* 点击展开（利用 active） */
+  #result td:nth-child(4):active {
+    -webkit-line-clamp: unset;
+    overflow: visible;
+    background: #fafafa;
+  }
+
+}
