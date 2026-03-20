@@ -74,20 +74,35 @@ iframe {
 /* ---- 搜索框样式 ---- */
 .search-box {
   width: 100%;
-  max-width: 650px;
+  max-width: 700px;       /* 🔥 稍微放宽 */
   display: flex;
-  margin: 20px 0;
+  margin: 20px auto;      /* 🔥 居中 */
 }
 
 .search-box input[type="text"] {
   flex: 1;
-  height: 40px;
+  height: 48px;              /* 🔥 增大高度 */
   font-size: 18px;
-  padding: 0 12px;
+  padding: 0 14px;
+  transition: all 0.2s ease;
   border: 1px solid #ccc;
-  border-radius: 4px 0 0 4px;
+  border-radius: 6px 0 0 6px;
   outline: none;
   box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* 🔥 就放在这里（紧跟后面） */
+.search-box input[type="text"]:focus {
+  border-color: #4da3ff;
+  box-shadow: 0 0 5px rgba(77,163,255,0.5);
+}
+
+/* 手机优化 */
+@media (max-width: 600px) {
+  .search-box input[type="text"] {
+    height: 52px;         /* 🔥 手机更高，方便点按 */
+    font-size: 16px;
+  }
 }
 
 /* 精准查询按钮 */
@@ -225,3 +240,4 @@ iframe {
     border-radius: 4px;
   }
 }
+
