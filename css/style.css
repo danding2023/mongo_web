@@ -6,10 +6,12 @@
 }
 
 html, body {
-  height: 100%;
-  font-family: "Microsoft YaHei", sans-serif;
+    font-family: "Microsoft YaHei", sans-serif;
   background: #fff;
   color: #333;
+  height:auto;
+  min-height:100%;
+  overflow-y:auto;
 }
 
 /* ---- 顶部 Header ---- */
