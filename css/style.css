@@ -278,6 +278,15 @@ iframe {
    📱 移动端统一适配（最终唯一版本）
    ========================================================= */
 @media (max-width: 768px) {
+/* 🔥 一定放在 @media 里面最前面 */
+#result table thead,
+#zibeiTable thead {
+  display: none !important;
+}
+#result th,
+#zibeiTable th {
+  display: none !important;
+}
 
   /* ===== 页面整体 ===== */
   iframe, #result {
