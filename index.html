@@ -25,7 +25,7 @@
     <button id="fuzzyBtn">模糊查询</button>
   </div>
 
-  <iframe id="contentFrame" name="contentFrame" src="pages/all_zibei.html"></iframe>
+  <iframe id="contentFrame" class="auto-iframe" name="contentFrame" src="pages/all_zibei.html"></iframe>
 
   <div id="result"></div>
 
@@ -141,6 +141,15 @@ iframe.addEventListener('load', () => {
 
 })();
 </script>
+<script>
+window.addEventListener('message', function (e) {
+  if (e.data && e.data.type === 'setHeight') {
+    const iframe = document.getElementById('contentFrame');
 
+    // ⭐ 平滑更新高度
+    iframe.style.height = e.data.height + 'px';
+  }
+});
+</script>
 </body>
 </html>

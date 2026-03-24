@@ -59,7 +59,8 @@ fetch('https://api.kongzhuanwang.site/zibeiyugaikuang.json?t=' + Date.now())
         <td>${item.备注 || ''}</td>`;
       tbody.appendChild(tr);
     });
-
+  // ⭐⭐⭐ 就是这里（forEach结束之后）
+  sendHeight();
     if (randomList.length === 0) {
       tbody.innerHTML = '<tr><td colspan="4">暂无数据</td></tr>';
     }
@@ -67,6 +68,22 @@ fetch('https://api.kongzhuanwang.site/zibeiyugaikuang.json?t=' + Date.now())
   .catch(err => {
     alert('失败：' + err.message);
   });
+</script>
+<script>
+function sendHeight() {
+  const height = document.body.scrollHeight;
+
+  window.parent.postMessage({
+    type: 'setHeight',
+    height: height
+  }, '*');
+}
+</script>
+<script>
+// ⭐ 兜底（放最后）
+window.onload = function () {
+  setTimeout(sendHeight, 100);
+};
 </script>
 </body>
 </html>

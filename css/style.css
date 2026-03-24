@@ -424,3 +424,9 @@ iframe {
   border-collapse: collapse;
   margin-top: 0;
 }
+.auto-iframe {
+  width: 100%;
+  border: none;
+  height: 0;                 /* 初始高度 */
+  transition: height 0.35s ease;  /* ⭐ 平滑动画 */
+}
