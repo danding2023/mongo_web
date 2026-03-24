@@ -411,3 +411,16 @@ iframe {
   }
 
 }
+
+.all_zibei_page {
+  margin: 0;
+}
+
+.all_zibei_page h2 {
+  margin: 10px 0;
+}
+
+.all_zibei_page table {
+  border-collapse: collapse;
+  margin-top: 0;
+}

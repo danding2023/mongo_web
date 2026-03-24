@@ -4,20 +4,9 @@
     <meta charset="UTF-8">
     <title>字辈信息示例</title>
     <link rel="stylesheet" href="../css/style.css">
-    <style>
-        table { border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 6px 12px; text-align: left; }
-        .hit-line{
-          font-size: 16px;
-          line-height: 32px;
-        }
-        .v-badge{
-          height: 26px;
-          vertical-align: middle;
-        }
-    </style>
+
 </head>
-<body>
+<body class="all_zibei_page">
 
 <h2>字辈信息示例</h2>
 
@@ -79,10 +68,5 @@ fetch('https://api.kongzhuanwang.site/zibeiyugaikuang.json?t=' + Date.now())
     alert('失败：' + err.message);
   });
 </script>
-
-<footer class="site-footer">
-  <span class="hit-line"></span>
-</footer>
-
 </body>
 </html>
