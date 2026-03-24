@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宗亲留言</title>
+
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+<style>
+body { font-family: Arial; background: #f5f5f5; padding: 20px; }
+.container { max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; }
+h1 { text-align: center; }
+label { margin-top: 15px; display: block; }
+input, textarea, select { width: 100%; padding: 10px; margin-top: 5px; }
+button { margin-top: 20px; width: 100%; padding: 12px; background: #007BFF; color: #fff; border: none; cursor:pointer; }
+button:disabled { background: #aaa; cursor: not-allowed; }
+.hidden { display:none; }
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>宗亲留言</h1>
+
+<form id="form">
+
+<label>留言类型</label>
+<select name="type" required>
+  <option value="">请选择</option>
+  <option value="添加字辈">添加字辈</option>
+  <option value="修改字辈">修改字辈</option>
+  <option value="寻亲登记">寻亲登记</option>
+</select>
+
+<label>留言内容</label>
+<textarea name="content" required></textarea>
+
+<label>邮箱</label>
+<input type="email" name="email" required>
+
+<label>电话</label>
+<input type="tel" name="phone" required>
+
+<!-- 蜜罐字段 -->
+<input type="text" name="website" class="hidden">
+
+<label id="captcha-label">验证码</label>
+<input type="text" name="captcha" required>
+
+<button type="submit" id="submitBtn">提交</button>
+
+</form>
+</div>
+
+<script>
+// 初始化 EmailJS
+emailjs.init("你的_PUBLIC_KEY"); // ← 替换
+
+const form = document.getElementById("form");
+const submitBtn = document.getElementById("submitBtn");
+let cooldown = false;
+
+// 生成随机验证码
+function generateCaptcha() {
+  const a = Math.floor(Math.random()*10);
+  const b = Math.floor(Math.random()*10);
+  const op = Math.random() < 0.5 ? '+' : '-';
+  const result = op === '+' ? a+b : a-b;
+  return { question: `${a} ${op} ${b} = ?`, answer: result };
+}
+
+// 初始化验证码
+let captcha = generateCaptcha();
+document.getElementById('captcha-label').innerText = `验证码：${captcha.question}`;
+
+// 防刷提交
+form.addEventListener('submit', function(e){
+  e.preventDefault();
+
+  if(cooldown){
+    alert("请稍等，30秒内只能提交一次");
+    return;
+  }
+
+  // 蜜罐检查
+  if(form.website.value !== ""){
+    alert("检测到异常提交");
+    return;
+  }
+
+  // 验证码检查
+  if(parseInt(form.captcha.value.trim()) !== captcha.answer){
+    alert("验证码错误");
+    captcha = generateCaptcha(); // 更新验证码
+    document.getElementById('captcha-label').innerText = `验证码：${captcha.question}`;
+    form.captcha.value = '';
+    return;
+  }
+
+  // 禁用按钮，冷却30秒
+  submitBtn.disabled = true;
+  cooldown = true;
+  setTimeout(() => {
+    submitBtn.disabled = false;
+    cooldown = false;
+  }, 30000);
+
+  // 发送邮件
+  emailjs.send("你的_SERVICE_ID", "你的_TEMPLATE_ID", {
+    type: form.type.value,
+    content: form.content.value,
+    email: form.email.value,
+    phone: form.phone.value
+  }).then(function(){
+    alert("提交成功！");
+    form.reset();
+    captcha = generateCaptcha(); // 更新验证码
+    document.getElementById('captcha-label').innerText = `验证码：${captcha.question}`;
+  }, function(error){
+    alert("发送失败：" + JSON.stringify(error));
+  });
+
+});
+</script>
+
+</body>
+</html>
