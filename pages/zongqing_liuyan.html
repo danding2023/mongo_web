@@ -55,7 +55,7 @@ button:disabled { background: #aaa; cursor: not-allowed; }
 
 <script>
 // 初始化 EmailJS
-emailjs.init("你的_PUBLIC_KEY"); // ← 替换
+emailjs.init("EFif_ldn1BjOoUQhl"); // ← 替换
 
 const form = document.getElementById("form");
 const submitBtn = document.getElementById("submitBtn");
@@ -107,7 +107,7 @@ form.addEventListener('submit', function(e){
   }, 30000);
 
   // 发送邮件
-  emailjs.send("你的_SERVICE_ID", "你的_TEMPLATE_ID", {
+  emailjs.send("service_j4m155r", "template_mbopyor", {
     type: form.type.value,
     content: form.content.value,
     email: form.email.value,
