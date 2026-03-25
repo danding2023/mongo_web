@@ -5,17 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>宗亲留言</title>
 
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-
 <style>
 body { font-family: Arial; background: #f5f5f5; padding: 20px; }
 .container { max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; }
 h1 { text-align: center; }
-label { margin-top: 15px; display: block; }
+label { display: block; margin-top: 15px; }
 input, textarea, select { width: 100%; padding: 10px; margin-top: 5px; }
 button { margin-top: 20px; width: 100%; padding: 12px; background: #007BFF; color: #fff; border: none; cursor:pointer; }
-button:disabled { background: #aaa; cursor: not-allowed; }
-.hidden { display:none; }
+button:disabled { background: #aaa; }
 </style>
 </head>
 <body>
@@ -42,11 +39,11 @@ button:disabled { background: #aaa; cursor: not-allowed; }
 <label>电话</label>
 <input type="tel" name="phone" required>
 
-<!-- 蜜罐字段 -->
-<input type="text" name="website" class="hidden">
+<!-- 蜜罐 -->
+<input type="text" name="website" style="display:none">
 
-<label id="captcha-label">验证码</label>
-<input type="text" name="captcha" required>
+<label>验证码：<span id="captcha"></span></label>
+<input type="text" id="captchaInput" required>
 
 <button type="submit" id="submitBtn">提交</button>
 
@@ -54,73 +51,68 @@ button:disabled { background: #aaa; cursor: not-allowed; }
 </div>
 
 <script>
-// 初始化 EmailJS
-emailjs.init("EFif_ldn1BjOoUQhl"); // ← 替换
-
 const form = document.getElementById("form");
+const captchaEl = document.getElementById("captcha");
 const submitBtn = document.getElementById("submitBtn");
+
+let captcha = generateCaptcha();
 let cooldown = false;
 
-// 生成随机验证码
 function generateCaptcha() {
   const a = Math.floor(Math.random()*10);
   const b = Math.floor(Math.random()*10);
-  const op = Math.random() < 0.5 ? '+' : '-';
-  const result = op === '+' ? a+b : a-b;
-  return { question: `${a} ${op} ${b} = ?`, answer: result };
+  const result = a + b;
+  captchaEl.innerText = `${a} + ${b} = ?`;
+  return result;
 }
 
-// 初始化验证码
-let captcha = generateCaptcha();
-document.getElementById('captcha-label').innerText = `验证码：${captcha.question}`;
-
-// 防刷提交
-form.addEventListener('submit', function(e){
+form.addEventListener("submit", async function(e){
   e.preventDefault();
 
-  if(cooldown){
-    alert("请稍等，30秒内只能提交一次");
+  if (cooldown) {
+    alert("请30秒后再提交");
     return;
   }
 
-  // 蜜罐检查
-  if(form.website.value !== ""){
-    alert("检测到异常提交");
+  // 蜜罐
+  if (form.website.value !== "") {
+    alert("非法提交");
     return;
   }
 
-  // 验证码检查
-  if(parseInt(form.captcha.value.trim()) !== captcha.answer){
+  // 验证码
+  if (parseInt(document.getElementById("captchaInput").value) !== captcha) {
     alert("验证码错误");
-    captcha = generateCaptcha(); // 更新验证码
-    document.getElementById('captcha-label').innerText = `验证码：${captcha.question}`;
-    form.captcha.value = '';
+    captcha = generateCaptcha();
     return;
   }
 
-  // 禁用按钮，冷却30秒
   submitBtn.disabled = true;
   cooldown = true;
-  setTimeout(() => {
+
+  setTimeout(()=>{
     submitBtn.disabled = false;
     cooldown = false;
-  }, 30000);
+  },30000);
 
-  // 发送邮件
-  emailjs.send("service_w3rwcz6", "template_mbopyor", {
-    type: form.type.value,
-    content: form.content.value,
-    email: form.email.value,
-    phone: form.phone.value
-  }).then(function(){
-    alert("提交成功！");
-    form.reset();
-    captcha = generateCaptcha(); // 更新验证码
-    document.getElementById('captcha-label').innerText = `验证码：${captcha.question}`;
-  }, function(error){
-    alert("发送失败：" + JSON.stringify(error));
+  const res = await fetch("https://zibeixinxiliuyan.271776169.workers.dev/", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      type: form.type.value,
+      content: form.content.value,
+      email: form.email.value,
+      phone: form.phone.value
+    })
   });
 
+  if (res.ok) {
+    alert("提交成功！");
+    form.reset();
+    captcha = generateCaptcha();
+  } else {
+    alert("发送失败！");
+  }
 });
 </script>
 
