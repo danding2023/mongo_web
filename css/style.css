@@ -443,3 +443,25 @@ iframe {
   height: 0;                 /* 初始高度 */
   transition: height 0.35s ease;  /* ⭐ 平滑动画 */
 }
+
+footer {
+  text-align: center;
+  padding: 12px 0;
+}
+
+footer div {
+  line-height: 1.6;
+}
+
+/* 关键：让计数器单独一行并居中 */
+.hit-line {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* 关键：让图片真正居中 */
+.v-badge {
+  display: block;
+  margin: 0 auto;
+}
