@@ -6,12 +6,21 @@
 }
 
 html, body {
+  height: 100%;
+  margin: 0;
   font-family: "Microsoft YaHei", sans-serif;
   background: #fff;
   color: #333;
-  min-height: 100%;
-  overflow-y: auto;
 }
+
+/* body 使用 flex 布局 */
+body {
+  display: flex;
+  flex-direction: column; /* header -> main -> footer */
+  min-height: 100vh;      /* 占满整个视口高度 */
+}
+
+
 
 /* ---- Header ---- */
 header {
@@ -74,16 +83,16 @@ header {
 /* ---- Footer 完全修正版 ---- */
 footer {
   display: flex;
-  flex-direction: column;   /* 上下排列 */
-  justify-content: center;  /* 主体垂直居中 */
+  flex-direction: column;
+  justify-content: center;  /* 垂直居中内容 */
   align-items: center;      /* 水平居中 */
   background: #f7f7f7;
   font-size: 14px;
   color: #888;
   border-top: 1px solid #eee;
+  padding: 12px 20px;
   text-align: center;
   line-height: 1.6;
-  padding: 12px 20px;       /* 给左右留点空隙 */
 }
 
 /* Footer 内的文字内容 */
@@ -110,12 +119,15 @@ footer div {
 }
 
 /* ---- 主内容 ---- */
+/* main 占据 header + footer 之外的剩余空间 */
 main {
+  flex: 1;                /* 自动撑满剩余空间 */
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 60px 20px;
-  min-height: calc(100vh - 140px);
+  padding: 60px 20px;     /* 可根据需要微调 */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* ---- iframe & 结果 ---- */
