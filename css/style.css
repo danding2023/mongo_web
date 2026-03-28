@@ -15,76 +15,98 @@ html, body {
 
 /* ---- Header ---- */
 header {
-   height: 110px;
+  height: 110px;
   display: flex;
   justify-content: center;
   align-items: center;
   background: linear-gradient(to bottom, #ffffff, #fafafa);
   border-bottom: 1px solid #eee;
-
-  /* 🔥 subtle渐变背景 */
-  background: linear-gradient(to bottom, #ffffff, #fafafa);
   color: #222;
-/* =========================================================
-   🏛️ 标题（文化风格）
-   ========================================================= */
+}
 
+/* ---- 标题（文化风格 + 印章） ---- */
+.title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* 印章风 */
+.seal {
+  width: 52px;
+  height: 52px;
+  background: #b60000;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: bold;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  font-family: "SimSun", serif;
+  letter-spacing: 2px;
+}
+
+/* 站点标题 */
 .site-title {
   font-size: 36px;
   font-weight: 600;
-  letter-spacing: 4px;              /* 🔥 拉开字距（更有气质） */
+  letter-spacing: 4px;
   color: #2c2c2c;
-font-family: "Noto Serif SC", "Microsoft YaHei", serif;
-  /* 🔥 轻微书卷感渐变 */
+  font-family: "Noto Serif SC", "Microsoft YaHei", serif;
   background: linear-gradient(90deg, #222, #555);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-
   position: relative;
 }
 
-/* 🔥 下方装饰线（关键点） */
 .site-title::after {
   content: "";
   display: block;
   width: 60px;
   height: 3px;
-  background: #d4af37;              /* 🔥 金色（家族/传统感） */
-  margin: 10px auto 0;
+  background: #d4af37;
+  margin: 8px auto 0;
   border-radius: 2px;
-}
 }
 
 /* ---- Footer ---- */
 footer {
   height: 60px;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   background: #f7f7f7;
   font-size: 14px;
   color: #888;
   border-top: 1px solid #eee;
-  text-align: center;   /* 整体居中 */
+  text-align: center;
   line-height: 1.6;
-padding: 10px 0;
+  padding: 12px 0;
 }
 
-footer .hit-line img.v-badge {
-  margin-left: 8px;
-  vertical-align: middle;
-  height: 26px;
-}
+footer div,
 .hit-line {
-  margin-top: 8px;      /* 和上面拉开一点距离 */
+  width: 100%;
+  display: block;
+  margin-top: 10px;
+  line-height: 1.6;
 }
-.hit-line img {
+
+.hit-line img,
+.v-badge {
+  display: block;
+  margin: 0 auto;
+  vertical-align: middle;
   border-radius: 6px;
 }
-.v-badge {
-  display: inline-block; /* 保持自然大小 */
-}
 
+.hit-line img.v-badge {
+  height: 26px;
+  margin-left: 8px;
+}
 
 /* ---- 主内容 ---- */
 main {
@@ -96,7 +118,8 @@ main {
 }
 
 /* ---- iframe & 结果 ---- */
-iframe, #result {
+iframe,
+#result {
   width: 100%;
   max-width: 1000px;
 }
@@ -107,12 +130,17 @@ iframe {
   border-radius: 6px;
   box-shadow: 0 0 8px rgba(0,0,0,0.05);
   margin-bottom: 20px;
+  transition: height 0.35s ease;
 }
 
-/* =========================================================
-   🔥 搜索框（升级版）
-   ========================================================= */
+.auto-iframe {
+  width: 100%;
+  border: none;
+  height: 0;
+  transition: height 0.35s ease;
+}
 
+/* ---- 搜索框 ---- */
 .search-box {
   width: 100%;
   max-width: 720px;
@@ -125,12 +153,10 @@ iframe {
   transition: all 0.2s ease;
 }
 
-/* hover 阴影 */
 .search-box:hover {
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-/* 输入框 */
 .search-box input[type="text"] {
   flex: 1;
   height: 50px;
@@ -138,15 +164,14 @@ iframe {
   padding: 0 18px;
   border: none;
   outline: none;
+  box-sizing: border-box;
 }
 
-/* 整体 focus 高亮 */
 .search-box:focus-within {
   border-color: #4da3ff;
   box-shadow: 0 0 8px rgba(77,163,255,0.4);
 }
 
-/* 按钮统一样式 */
 .search-box button {
   padding: 0 18px;
   border: none;
@@ -157,20 +182,15 @@ iframe {
   transition: background 0.2s;
 }
 
-/* 按钮 hover */
 .search-box button:hover {
   background: #2f86e0;
 }
 
-/* 按钮分隔线 */
 .search-box button + button {
   border-left: 1px solid rgba(255,255,255,0.3);
 }
 
-/* =========================================================
-   📊 查询结果
-   ========================================================= */
-
+/* ---- 查询结果 ---- */
 :root {
   --key-bg-color: #ffeb3b;
   --key-ft-color: #d32f2f;
@@ -203,8 +223,10 @@ iframe {
   width: 100%;
 }
 
-#result th, #zibeiTable th,
-#result td, #zibeiTable td {
+#result th,
+#zibeiTable th,
+#result td,
+#zibeiTable td {
   border: var(--table-border);
   padding: var(--table-padding);
   vertical-align: middle;
@@ -223,86 +245,34 @@ iframe {
   background-color: var(--stripe-even);
 }
 
-/* 查询数量高亮 */
 .count-num {
   color: red;
   font-weight: bold;
   font-size: 1.2em;
 }
 
-/* =========================================================
-   🏛️ 标题 + 印章 Logo
-   ========================================================= */
-
-.title-wrap {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+/* ---- 全部字辈页面 ---- */
+.all_zibei_page {
+  margin: 0;
 }
 
-/* 🔴 印章风 */
-.seal {
-  width: 52px;
-  height: 52px;
-  background: #b60000;
-  color: #fff;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 26px;
-  font-weight: bold;
-
-  border-radius: 6px;                 /* 微圆角（像印章） */
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-
-  /* 🔥 印章质感 */
-  font-family: "SimSun", serif;
-  letter-spacing: 2px;
+.all_zibei_page h2 {
+  margin: 10px 0;
 }
 
-/* 标题 */
-.site-title {
-  font-size: 34px;
-  font-weight: 600;
-  letter-spacing: 4px;
-  color: #2c2c2c;
-
-  background: linear-gradient(90deg, #222, #555);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-
-  position: relative;
+.all_zibei_page table {
+  border-collapse: collapse;
+  margin-top: 0;
 }
 
-/* 金色装饰线 */
-.site-title::after {
-  content: "";
-  display: block;
-  width: 60px;
-  height: 3px;
-  background: #d4af37;
-  margin-top: 8px;
-  border-radius: 2px;
-}
-/* =========================================================
-   📱 移动端统一适配（最终修正版）
-   ========================================================= */
+/* ---- 移动端适配 ---- */
 @media (max-width: 768px) {
-
-  /* =====================================================
-     🔥 1. 先处理 iframe（必须最前）
-     ===================================================== */
   iframe {
     display: none !important;
     width: 0 !important;
     height: 0 !important;
   }
 
-  /* =====================================================
-     🔥 2. 彻底干掉所有表头（只保留一套）
-     ===================================================== */
   #result thead,
   #zibeiTable thead,
   #result th,
@@ -310,16 +280,10 @@ iframe {
     display: none !important;
   }
 
-  /* =====================================================
-     页面整体
-     ===================================================== */
   #result {
     width: 95%;
   }
 
-  /* =====================================================
-     标题
-     ===================================================== */
   .site-title {
     font-size: 24px;
     letter-spacing: 2px;
@@ -335,21 +299,15 @@ iframe {
     gap: 10px;
   }
 
-  /* =====================================================
-     搜索框（已优化版）
-     ===================================================== */
   .search-box {
     max-width: 95%;
-    display: flex;
     flex-direction: column;
     gap: 12px;
     border-radius: 12px;
-    overflow: hidden;
   }
 
   .search-box input[type="text"] {
     height: 68px;
-    box-sizing: border-box;
     font-size: 18px;
     padding: 0 18px;
     border-radius: 8px;
@@ -357,7 +315,6 @@ iframe {
 
   .search-box button {
     height: 56px;
-    box-sizing: border-box;
     font-size: 16px;
     width: 100%;
     border-left: none;
@@ -365,10 +322,7 @@ iframe {
     border-radius: 8px;
   }
 
-  /* =====================================================
-     🔥 表格 → 卡片
-     ===================================================== */
-
+  /* 表格 → 卡片样式 */
   #result table,
   #result tbody {
     display: block;
@@ -398,70 +352,8 @@ iframe {
     border-bottom: none;
   }
 
-  /* 字段名 */
-  #result td:nth-child(1)::before {
-    content: "ID号：";
-    font-weight: bold;
-    color: #666;
-  }
-
-  #result td:nth-child(2)::before {
-    content: "聚居地：";
-    font-weight: bold;
-    color: #666;
-  }
-
-  #result td:nth-child(3)::before {
-    content: "字辈：";
-    font-weight: bold;
-    color: #666;
-  }
-
-  #result td:nth-child(4)::before {
-    content: "备注：";
-    font-weight: bold;
-    color: #666;
-  }
-
-}
-
-.all_zibei_page {
-  margin: 0;
-}
-
-.all_zibei_page h2 {
-  margin: 10px 0;
-}
-
-.all_zibei_page table {
-  border-collapse: collapse;
-  margin-top: 0;
-}
-.auto-iframe {
-  width: 100%;
-  border: none;
-  height: 0;                 /* 初始高度 */
-  transition: height 0.35s ease;  /* ⭐ 平滑动画 */
-}
-
-footer {
-  text-align: center;
-  padding: 12px 0;
-}
-
-footer div {
-  line-height: 1.6;
-}
-
-/* 关键：让计数器单独一行并居中 */
-.hit-line {
-  display: block;
-  width: 100%;
-  margin-top: 10px;
-}
-
-/* 关键：让图片真正居中 */
-.v-badge {
-  display: block;
-  margin: 0 auto;
+  #result td:nth-child(1)::before { content: "ID号："; font-weight: bold; color: #666; }
+  #result td:nth-child(2)::before { content: "聚居地："; font-weight: bold; color: #666; }
+  #result td:nth-child(3)::before { content: "字辈："; font-weight: bold; color: #666; }
+  #result td:nth-child(4)::before { content: "备注："; font-weight: bold; color: #666; }
 }
