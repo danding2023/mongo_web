@@ -39,7 +39,6 @@ button:disabled { background: #aaa; }
 <label>电话</label>
 <input type="tel" name="phone" required>
 
-<!-- 蜜罐 -->
 <input type="text" name="website" style="display:none">
 
 <label>验证码：<span id="captcha"></span></label>
@@ -74,13 +73,11 @@ form.addEventListener("submit", async function(e){
     return;
   }
 
-  // 蜜罐
   if (form.website.value !== "") {
     alert("非法提交");
     return;
   }
 
-  // 验证码
   if (parseInt(document.getElementById("captchaInput").value) !== captcha) {
     alert("验证码错误");
     captcha = generateCaptcha();
@@ -95,23 +92,37 @@ form.addEventListener("submit", async function(e){
     cooldown = false;
   },30000);
 
-  const res = await fetch("https://zibeixinxiliuyan.271776169.workers.dev/", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-      type: form.type.value,
-      content: form.content.value,
-      email: form.email.value,
-      phone: form.phone.value
-    })
-  });
+  try {
+    const res = await fetch("https://zibeixinxiliuyan.271776169.workers.dev/", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        type: form.type.value,
+        content: form.content.value,
+        email: form.email.value,
+        phone: form.phone.value
+      })
+    });
 
-  if (res.ok) {
-    alert("提交成功！");
-    form.reset();
-    captcha = generateCaptcha();
-  } else {
-    alert("发送失败！");
+    // 关键：读取返回内容
+    const text = await res.text();
+
+    // 调试输出（一定要看这里）
+    console.log("返回状态:", res.status);
+    console.log("返回内容:", text);
+
+    // 修正：必须同时满足才算成功
+    if (res.ok && text.includes("id")) {
+      alert("提交成功！");
+      form.reset();
+      captcha = generateCaptcha();
+    } else {
+      alert("发送失败：" + text);
+    }
+
+  } catch (err) {
+    console.error("请求异常:", err);
+    alert("网络错误，提交失败！");
   }
 });
 </script>
