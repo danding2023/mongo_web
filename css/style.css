@@ -65,6 +65,9 @@ footer {
   font-size: 14px;
   color: #888;
   border-top: 1px solid #eee;
+  text-align: center;   /* 整体居中 */
+  line-height: 1.6;
+padding: 10px 0;
 }
 
 footer .hit-line img.v-badge {
@@ -72,6 +75,16 @@ footer .hit-line img.v-badge {
   vertical-align: middle;
   height: 26px;
 }
+.hit-line {
+  margin-top: 8px;      /* 和上面拉开一点距离 */
+}
+.hit-line img {
+  border-radius: 6px;
+}
+.v-badge {
+  display: inline-block; /* 保持自然大小 */
+}
+
 
 /* ---- 主内容 ---- */
 main {

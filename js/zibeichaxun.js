@@ -91,9 +91,3 @@ const Zibeichaxun = (() => {
 
   return { query, queryStrict };
 })();
-
-
-.hit-line {
-  text-align: center;
-  margin-top: 8px;
-}
