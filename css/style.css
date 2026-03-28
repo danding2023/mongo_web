@@ -71,13 +71,13 @@ header {
   border-radius: 2px;
 }
 
-/* ---- Footer ---- */
+/* ---- Footer 修正版 ---- */
 footer {
   height: 60px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  justify-content: center;  /* 垂直居中 */
+  align-items: center;      /* 水平居中 */
   background: #f7f7f7;
   font-size: 14px;
   color: #888;
@@ -87,14 +87,17 @@ footer {
   padding: 12px 0;
 }
 
+/* footer 内 div 和计数器行 */
 footer div,
 .hit-line {
-  width: 100%;
-  display: block;
+  display: flex;            /* 使用 flex 避免 width:100% 导致左对齐 */
+  justify-content: center;  /* 水平居中 */
+  align-items: center;      /* 垂直居中 */
   margin-top: 10px;
   line-height: 1.6;
 }
 
+/* 图片徽章居中 */
 .hit-line img,
 .v-badge {
   display: block;
@@ -103,9 +106,10 @@ footer div,
   border-radius: 6px;
 }
 
+/* 单独调整徽章高度 */
 .hit-line img.v-badge {
   height: 26px;
-  margin-left: 8px;
+  margin-left: 8px; /* 如果仍需文字旁边偏移 */
 }
 
 /* ---- 主内容 ---- */
