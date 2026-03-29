@@ -26,13 +26,7 @@
     <button id="fuzzyBtn">模糊查询</button>
   </div>
 
-  <!-- ✅ iframe 改为 Worker（秒开） -->
-  <iframe 
-    id="contentFrame" 
-    class="auto-iframe" 
-    name="contentFrame" 
-    src="pages/all_zibei.html">
-  </iframe>
+<iframe src="pages/all_zibei.html"></iframe>
 
   <div id="result"></div>
 
@@ -80,7 +74,7 @@ iframe.addEventListener('load', () => {
     result.textContent = '加载数据中...';
 
     // ✅ 已去掉防缓存参数（性能优化）
-    const res = await fetch(API_URL);
+   const res = await fetch(API_URL + '?v=' + Date.now());
 
     if(!res.ok) throw new Error('接口错误 ' + res.status);
 
