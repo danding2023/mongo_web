@@ -27,7 +27,7 @@
 <script>
 const limit = 2;
 
-// ⭐ 开始计时（页面一加载就开始）
+// ⭐ 开始计时
 const startTime = performance.now();
 
 // ===== 高性能随机抽样函数 =====
@@ -65,13 +65,12 @@ fetch('https://api.kongzhuanwang.site/zibeiyugaikuang.json?t=' + Date.now())
       tbody.appendChild(tr);
     });
 
-    // ⭐ 通知父页面更新高度
     sendHeight();
 
-    // ⭐ 计算并显示加载耗时
+    // ⭐ 改为“秒”为单位
     const endTime = performance.now();
-    const loadTime = (endTime - startTime).toFixed(2);
-    document.getElementById('loadTime').innerText = `加载耗时：${loadTime} ms`;
+    const loadTime = ((endTime - startTime) / 1000).toFixed(2);
+    document.getElementById('loadTime').innerText = `加载耗时：${loadTime} 秒`;
 
     if (randomList.length === 0) {
       tbody.innerHTML = '<tr><td colspan="4">暂无数据</td></tr>';
@@ -94,7 +93,7 @@ function sendHeight() {
 </script>
 
 <script>
-// ⭐ 兜底（防止某些情况下未触发）
+// ⭐ 兜底
 window.onload = function () {
   setTimeout(sendHeight, 100);
 };
