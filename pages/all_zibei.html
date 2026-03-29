@@ -30,6 +30,14 @@ const limit = 2;
 // ⭐ 开始计时
 const startTime = performance.now();
 
+// ⭐ 实时计时器（每100ms更新一次）
+const timerEl = document.getElementById('loadTime');
+const timer = setInterval(() => {
+  const now = performance.now();
+  const seconds = ((now - startTime) / 1000).toFixed(2);
+  timerEl.innerText = `加载耗时：${seconds} 秒...`;
+}, 100);
+
 // ===== 高性能随机抽样函数 =====
 function getRandomItems(arr, count) {
   const result = [];
@@ -46,7 +54,7 @@ function getRandomItems(arr, count) {
   return result;
 }
 
-// ===== 加载 + 随机显示 =====
+// ===== 加载 + 渲染 =====
 fetch('https://api.kongzhuanwang.site/zibeiyugaikuang.json?t=' + Date.now())
   .then(res => res.json())
   .then(data => {
@@ -67,16 +75,21 @@ fetch('https://api.kongzhuanwang.site/zibeiyugaikuang.json?t=' + Date.now())
 
     sendHeight();
 
-    // ⭐ 改为“秒”为单位
+    // ⭐ 停止动态计时
+    clearInterval(timer);
+
+    // ⭐ 最终耗时
     const endTime = performance.now();
     const loadTime = ((endTime - startTime) / 1000).toFixed(2);
-    document.getElementById('loadTime').innerText = `加载耗时：${loadTime} 秒`;
+    timerEl.innerText = `加载耗时：${loadTime} 秒`;
 
     if (randomList.length === 0) {
       tbody.innerHTML = '<tr><td colspan="4">暂无数据</td></tr>';
     }
   })
   .catch(err => {
+    clearInterval(timer); // 防止异常时一直跑
+    timerEl.innerText = '加载失败';
     alert('失败：' + err.message);
   });
 </script>
@@ -93,7 +106,6 @@ function sendHeight() {
 </script>
 
 <script>
-// ⭐ 兜底
 window.onload = function () {
   setTimeout(sendHeight, 100);
 };
