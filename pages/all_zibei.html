@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <title>字辈信息示例</title>
     <link rel="stylesheet" href="../css/style.css">
-
 </head>
 <body class="all_zibei_page">
 
-<h2>字辈信息示例</h2>
+<h2>
+  字辈信息示例
+  <span id="loadTime" style="font-size:14px; color:#888; margin-left:10px;"></span>
+</h2>
 
 <table border="1" id="zibeiTable">
     <thead>
@@ -24,6 +26,9 @@
 
 <script>
 const limit = 2;
+
+// ⭐ 开始计时（页面一加载就开始）
+const startTime = performance.now();
 
 // ===== 高性能随机抽样函数 =====
 function getRandomItems(arr, count) {
@@ -59,8 +64,15 @@ fetch('https://api.kongzhuanwang.site/zibeiyugaikuang.json?t=' + Date.now())
         <td>${item.备注 || ''}</td>`;
       tbody.appendChild(tr);
     });
-  // ⭐⭐⭐ 就是这里（forEach结束之后）
-  sendHeight();
+
+    // ⭐ 通知父页面更新高度
+    sendHeight();
+
+    // ⭐ 计算并显示加载耗时
+    const endTime = performance.now();
+    const loadTime = (endTime - startTime).toFixed(2);
+    document.getElementById('loadTime').innerText = `加载耗时：${loadTime} ms`;
+
     if (randomList.length === 0) {
       tbody.innerHTML = '<tr><td colspan="4">暂无数据</td></tr>';
     }
@@ -69,6 +81,7 @@ fetch('https://api.kongzhuanwang.site/zibeiyugaikuang.json?t=' + Date.now())
     alert('失败：' + err.message);
   });
 </script>
+
 <script>
 function sendHeight() {
   const height = document.body.scrollHeight;
@@ -79,11 +92,13 @@ function sendHeight() {
   }, '*');
 }
 </script>
+
 <script>
-// ⭐ 兜底（放最后）
+// ⭐ 兜底（防止某些情况下未触发）
 window.onload = function () {
   setTimeout(sendHeight, 100);
 };
 </script>
+
 </body>
 </html>
