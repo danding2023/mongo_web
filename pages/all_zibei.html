@@ -109,8 +109,15 @@ window.onload = function () {
   setTimeout(sendHeight, 100);
 };
 
-// ⭐ 关键：持续同步高度（解决跨域问题）
-setInterval(sendHeight, 500);
+// ⭐ 数据变化时再更新（关键优化）
+const observer = new MutationObserver(() => {
+  sendHeight();
+});
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});
 </script>
 
 </body>
