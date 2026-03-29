@@ -55,7 +55,7 @@ function getRandomItems(arr, count) {
 }
 
 // ===== 加载 + 渲染 =====
-fetch('https://api.kongzhuanwang.site/zibeiyugaikuang.json?t=' + Date.now())
+fetch('https://allzibei.kongzhuanwang.site/?limit=2')
   .then(res => res.json())
   .then(data => {
     const tbody = document.querySelector('#zibeiTable tbody');
